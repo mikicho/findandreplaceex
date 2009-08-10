@@ -1,0 +1,11 @@
+E:\My Documents\Bdelphi\new FlashDevelop\FD3\External\Plugins\FindReplaceEx\obj\Release\ResolveAssemblyReference.cache
+D:\My Documents\Bdelphi\new FlashDevelop\FD3\FlashDevelop\Bin\Debug\Plugins\FindReplaceEx.dll.config
+D:\My Documents\Bdelphi\new FlashDevelop\FD3\FlashDevelop\Bin\Debug\Plugins\FindReplaceEx.dll
+D:\My Documents\Bdelphi\new FlashDevelop\FD3\FlashDevelop\Bin\Debug\Plugins\FindReplaceEx.pdb
+D:\My Documents\Bdelphi\new FlashDevelop\FD3\External\Plugins\FindReplaceEx\obj\Release\ResolveAssemblyReference.cache
+D:\My Documents\Bdelphi\new FlashDevelop\FD3\External\Plugins\FindReplaceEx\obj\Release\FindReplaceEx.PluginUI.resources
+D:\My Documents\Bdelphi\new FlashDevelop\FD3\External\Plugins\FindReplaceEx\obj\Release\FindReplaceEx.Properties.Resources.resources
+D:\My Documents\Bdelphi\new FlashDevelop\FD3\External\Plugins\FindReplaceEx\obj\Release\FindReplaceEx.Resources.en_US.resources
+D:\My Documents\Bdelphi\new FlashDevelop\FD3\External\Plugins\FindReplaceEx\obj\Release\FindReplaceEx.csproj.GenerateResource.Cache
+D:\My Documents\Bdelphi\new FlashDevelop\FD3\External\Plugins\FindReplaceEx\obj\Release\FindReplaceEx.dll
+D:\My Documents\Bdelphi\new FlashDevelop\FD3\External\Plugins\FindReplaceEx\obj\Release\FindReplaceEx.pdb
