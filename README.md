@@ -1,4 +1,4 @@
-Linkes for change logs and images:
+<h4>Linkes for change logs and images:</h4> 
 Legacy version - Have nice explantion - http://www.flashdevelop.org/community/viewtopic.php?f=4&t=4043 </br>
 An updated version - with a lot of new features - http://www.flashdevelop.org/community/viewtopic.php?f=4&t=12200
 
