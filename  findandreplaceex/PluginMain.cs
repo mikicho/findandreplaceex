@@ -24,6 +24,7 @@ using PluginCore.Utilities;
 using ASCompletion.Context;
 using ASCompletion.Model;
 using System.Collections.Generic;
+using FindReplaceEx.Resources;
 
 namespace FindReplaceEx
 {
@@ -36,7 +37,7 @@ namespace FindReplaceEx
 		private string pluginAuth = "Itzik Arzoni";
 		private string pluginHelp = "http://www.flashdevelop.org/community/viewtopic.php?t=485";
 		private string pluginDesc = "Find and Replace plugin Expanded";
-		private EventType eventMask = EventType.UIRefresh | EventType.ApplySettings | EventType.Keys;
+        private EventType eventMask = EventType.UIRefresh | EventType.ApplySettings | EventType.Keys | EventType.FileSwitch;
 		private DockContent pluginPanel;
 		private PluginUI pluginUI;
         private String settingFilename;
@@ -191,20 +192,22 @@ namespace FindReplaceEx
 
 					break;
 				case EventType.Keys:
-					Keys key = ((KeyEvent)e).Value;
-                    if (key == settingObject.ReplaceShortcut)
-					{
-						pluginUI.EnableFocus(true);
-						e.Handled = false;
-					}
-					else if (key == settingObject.FindShortcut)
-					{
-						pluginUI.EnableFocus();
-						e.Handled = true;
-					}
-					break;
-
-          }
+                    Keys key = ((KeyEvent)e).Value;
+                    if (key == PluginBase.MainForm.GetShortcutItemKeys("FindReplaceEx.Replace"))
+                    {
+                        this.pluginUI.PluginUI_FocusHandle(null, null);
+                        e.Handled = false;
+                    }
+                    else if (key == PluginBase.MainForm.GetShortcutItemKeys("FindReplaceEx.Find"))
+                    {
+                        this.Panel.Show();
+                        e.Handled = true;
+                    }
+					break;  
+                case EventType.FileSwitch:
+                    pluginUI.setFilterMaskTxt(PluginBase.MainForm.CurrentDocument.FileName.Split('.')[1]);
+                    break;
+            }
         }
 
         private void UpdateSettings()
@@ -223,19 +226,43 @@ namespace FindReplaceEx
         /// </summary>
         public void InitBasics()
         {
-            this.pluginDesc = TextHelper.GetString("Info.Description");
+            InitLocalization();
             String dataPath = Path.Combine(PathHelper.DataDir, "FindReplaceEx");
             if (!Directory.Exists(dataPath)) Directory.CreateDirectory(dataPath);
             this.settingFilename = Path.Combine(dataPath, "Settings.fdb");
             this.pluginImage = PluginBase.MainForm.FindImage("484|12|4|-1");
         }
 
+
+        /// <summary>
+        /// Initializes the localization of the plugin
+        /// </summary>
+        public void InitLocalization()
+        {
+            LocaleVersion locale = PluginBase.MainForm.Settings.LocaleVersion;
+            switch (locale)
+            {
+                /*
+                case LocaleVersion.fi_FI : 
+                    // We have Finnish available... or not. :)
+                    LocaleHelper.Initialize(LocaleVersion.fi_FI);
+                    break;
+                */
+                default:
+                    // Plugins should default to English...
+                    LocaleHelper.Initialize(LocaleVersion.en_US);
+                    break;
+            }
+            this.pluginDesc = LocaleHelper.GetString("Info.Description");
+        }
+
+
         /// <summary>
         /// Adds the required event handlers
         /// </summary> 
         public void AddEventHandlers()
         {
-            EventManager.AddEventHandler(this, eventMask);
+            EventManager.AddEventHandler(this, eventMask);          
         }
 
         /// <summary>
@@ -244,8 +271,10 @@ namespace FindReplaceEx
         public void CreatePluginPanel()
         {
             this.pluginUI = new PluginUI(this);
-            this.pluginUI.Text = "F&R Ex";
-            this.pluginPanel = PluginBase.MainForm.CreateDockablePanel(this.pluginUI, this.pluginGuid, this.pluginImage, DockState.DockBottomAutoHide);
+            this.pluginUI.Text = "Advanced F&R";
+            this.pluginPanel = PluginBase.MainForm.CreateDockablePanel(this.pluginUI, this.pluginGuid, this.pluginImage, DockState.DockBottomAutoHide);            
+            PluginBase.MainForm.DockPanel.ActiveContentChanged += pluginUI.PluginUI_FocusHandle;
+            this.Panel.DockHandler.DockStateChanged += pluginUI.DockHandler_DockStateChanged;
         }
 
         /// <summary>
@@ -253,8 +282,8 @@ namespace FindReplaceEx
         /// </summary>
         public void CreateMenuItem()
         {
-            //String title = TextHelper.GetString("Label.ViewMenuItem");
-            String title = "Find And Replace Expanded";
+            //String title = LocalHelper.GetString("Label.ViewMenuItem");
+            String title = "Advanced Find And Replace";
             ToolStripMenuItem viewMenu = (ToolStripMenuItem)PluginBase.MainForm.FindMenuItem("ViewMenu");
             viewMenu.DropDownItems.Add(new ToolStripMenuItem(title, this.pluginImage, new EventHandler(this.OpenPanel)));
         }
@@ -271,6 +300,8 @@ namespace FindReplaceEx
                 Object obj = ObjectSerializer.Deserialize(this.settingFilename, this.settingObject);
                 this.settingObject = (Settings)obj;
             }
+            PluginBase.MainForm.RegisterShortcutItem("FindReplaceEx.Find", Keys.Alt | Keys.F);
+            PluginBase.MainForm.RegisterShortcutItem("FindReplaceEx.Replace", Keys.Alt | Keys.R);
         }
 
         /// <summary>
@@ -300,7 +331,6 @@ namespace FindReplaceEx
         public void UpdateProjectClassPaths()
 		{
             List<PathModel> classPath = ASContext.Context.Classpath;
-
             string[] paths = new string[classPath.Count];
             int i = 0;
 
@@ -447,18 +477,6 @@ namespace FindReplaceEx
 		}
 		
         /// <summary>
-        /// Initiate a find in folders search
-        /// </summary>
-        /// <param name="pattern">text to find in a form of regexp expression</param>
-        /// <param name="folder">folder to search</param>
-        /// <param name="recursive">set true to search subfolders</param>
-        /// <returns>results</returns>
-		public FindResults GetFindInFolderResultsList(string pattern, string folder, bool recursive)
-		{
-			return GetFindInFolderResultsList(pattern, folder, "*.as", recursive);
-		}
-
-        /// <summary>
         /// Initiate a find in folders search with different file mask
         /// </summary>
         /// <param name="pattern">text to find in a form of regexp expression</param>
@@ -576,6 +594,16 @@ namespace FindReplaceEx
         public object Settings
         {
             get { return settingObject; }
+        }
+
+        #endregion
+
+        #region IPlugin Members
+
+
+        public int Api
+        {
+            get { return 1; }
         }
 
         #endregion

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using PluginCore.Localization;
 using PluginCore;
 
-namespace SimpleScriptPlugin.Resources
+namespace FindReplaceEx.Resources
 {
     class LocaleHelper
     {
@@ -17,7 +17,7 @@ namespace SimpleScriptPlugin.Resources
         /// </summary>
         public static void Initialize(LocaleVersion locale)
         {
-            String path = "SimpleScriptPlugin.Resources." + locale.ToString();
+            String path = "FindReplaceEx.Resources." + locale.ToString();
             resources = new ResourceManager(path, Assembly.GetExecutingAssembly());
         }
 

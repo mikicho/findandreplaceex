@@ -10,13 +10,9 @@ namespace FindReplaceEx
     [Serializable]
     public class Settings 
     {
-        public const Keys DEFAULT_FIND = Keys.Alt | Keys.F;
-        public const Keys DEFAULT_REPLACE = Keys.Alt| Keys.R;
 
         //public const string[] DEFAULT_FILTER_PRESETS = ["(import|new)\\s*[\\w\\.]*@FIND[\\.;],(function|var)\\s*\\w*\\s*:\\s*@FIND\\s*[;\\(]"];
 
-        private Keys findShortcut = DEFAULT_FIND;
-        private Keys replaceShortcut = DEFAULT_REPLACE;
         private bool findAsYouType = true;
         private bool feedWordAsYouType = true;
         private bool feedWordOnCaretMovement = true;
@@ -24,26 +20,13 @@ namespace FindReplaceEx
         private bool groupByFile = true;
         private int ignoreCharactersBelow = 3;
         private int typingTimerInterval = 500;
+        private int searchHistoryLimit = 10;
+        private bool resizeOptionsTab = true;
+        private bool resizeReplaceTab = false;
+        private bool resizeFilterTab = false;
+        private bool resizeFoldersTab = true;
+        private bool resizeOperationsTab = true;
         private string[] filterPresets = null;
-
-
-        [DisplayName("Find Shortcut")]
-        [Category("Shortcuts")] 
-        [Description("A keybard shortcut to focus on the find input box"), DefaultValue(DEFAULT_FIND)]
-        public Keys FindShortcut
-        {
-            get { return findShortcut; }
-            set { findShortcut = value; }
-        }
-
-        [DisplayName("Replace Shortcut")]
-        [Category("Shortcuts")]
-        [Description("A keybard shortcut to focus on the find input box"), DefaultValue(DEFAULT_REPLACE)]
-        public Keys ReplaceShortcut
-        {
-            get { return replaceShortcut; }
-            set { replaceShortcut = value; }
-        }
 
         [DisplayName("Find As You Type")]
         [Category("Settings")]
@@ -120,6 +103,61 @@ namespace FindReplaceEx
             get { return filterPresets; }
             set { filterPresets = value; }
         }
+
+        [DisplayName("Search History Limit")]
+        [Category("Settings")]
+        [Description("Determine how much history will be saved in find combo box"), DefaultValue(10)]
+        public int SearchHistoryLimit
+        {
+            get { return searchHistoryLimit; }
+            set { searchHistoryLimit = value; }
+        }
+
+        [DisplayName("Options Tab Open")]
+        [Category("Resize Result List")]
+        [Description("Resize result list if the plugin lost focus when Options tab open"), DefaultValue(true)]
+        public bool ResizeOptionsTab
+        {
+            get { return resizeOptionsTab; }
+            set { resizeOptionsTab = value; }
+        }
+
+        [DisplayName("Replace Tab Open")]
+        [Category("Resize Result List")]
+        [Description("Resize result list if the plugin lost focus when Replace tab open"), DefaultValue(false)]
+        public bool ResizeReplaceTab
+        {
+            get { return resizeReplaceTab; }
+            set { resizeReplaceTab = value; }
+        }
+
+        [DisplayName("Filter Tab Open")]
+        [Category("Resize Result List")]
+        [Description("Resize result list if the plugin lost focus when Filter tab open"), DefaultValue(false)]
+        public bool ResizeFilterTab
+        {
+            get { return resizeFilterTab; }
+            set { resizeFilterTab = value; }
+        }
+
+        [DisplayName("Folders Tab Open")]
+        [Category("Resize Result List")]
+        [Description("Resize result list if the plugin lost focus when Folders tab open"), DefaultValue(true)]
+        public bool ResizeFoldersTab
+        {
+            get { return resizeFoldersTab; }
+            set { resizeFoldersTab = value; }
+        }
+
+        [DisplayName("Operations Tab Open")]
+        [Category("Resize Result List")]
+        [Description("Resize result list if the plugin lost focus when Operations tab open"), DefaultValue(true)]
+        public bool ResizeOperationsTab
+        {
+            get { return resizeOperationsTab; }
+            set { resizeOperationsTab = value; }
+        }
+
     }
 
 }
