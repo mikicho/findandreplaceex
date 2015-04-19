@@ -1,0 +1,1 @@
+A pane for Advanced Find, Replace, research, navigation and refactor in the AS projects, for FlashDevelop
