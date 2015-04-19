@@ -1,5 +1,5 @@
 Linkes for change logs and images:
-Legacy version - Have nice explantion - http://www.flashdevelop.org/community/viewtopic.php?f=4&t=4043
+Legacy version - Have nice explantion - http://www.flashdevelop.org/community/viewtopic.php?f=4&t=4043 </br>
 An updated version - with a lot of new features - http://www.flashdevelop.org/community/viewtopic.php?f=4&t=12200
 
 <h4>Description:</h4>
