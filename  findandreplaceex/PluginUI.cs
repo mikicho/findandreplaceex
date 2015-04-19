@@ -20,6 +20,9 @@ using System.Collections.Generic;
 using PluginCore;
 using PluginCore.Managers;
 using System.Drawing;
+using PluginCore.Managers;//remove
+using FlashDevelop;
+using WeifenLuo.WinFormsUI.Docking;
 
 
 namespace FindReplaceEx
@@ -34,7 +37,7 @@ namespace FindReplaceEx
 		private PluginMain plugin;
 		private string lastPath;
         private bool replaceShown;
-        private TextBox findTxt;
+        private ComboBox findTxt;
         private ToolTip toolTip;
         private TabControl tabControl;
         private TabPage optionsPage;
@@ -47,7 +50,7 @@ namespace FindReplaceEx
         private TextBox replaceTxt;
         private Button replaceBtn;
         private Button copyFindReplaceBtn;
-        private Button button1;
+        private Button clearReplaceTxt;
         private Button ofrBtn;
         private TabPage filterPage;
         private ComboBox filterTxt;
@@ -67,11 +70,7 @@ namespace FindReplaceEx
         private RadioButton checkAllRdo;
         private ColumnHeader at;
         private ListView resultsLst;
-        private ColumnHeader columnLineNum;
-        private ColumnHeader columnFileName;
-        private ColumnHeader columnLineText;
         private FolderBrowserDialog fileBrowserDlg;
-        private Button findBtn;
         private CheckBox regexpChk;
         private CheckBox wholeWordChk;
         private CheckBox matchCaseChk;
@@ -84,7 +83,12 @@ namespace FindReplaceEx
         private Button bookmarkBtn;
         private Button clearFilterBtn;
         private CheckBox regExReplaceChk;
-		private string state;
+        private Button CopyResultsBtn;
+        private ListViewItem currentItem;
+        private bool toolTipShow;
+        private Splitter splitter;
+        private Panel optionsPanel;
+        private bool inReplace;
 //		private bool classPathRoot;
 		
 		public PluginUI(PluginMain pluginMain)
@@ -94,7 +98,6 @@ namespace FindReplaceEx
 			// reference to the plugin interface
 			this.plugin = pluginMain;
 			toolTip.Active = true;
-			state = "<>";
 			// switchFindReplaceBtn.Image = plugin.MainForm.GetSystemImage(10);
 			
 			
@@ -109,7 +112,7 @@ namespace FindReplaceEx
 		/// </summary>
 		private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
-            this.findTxt = new System.Windows.Forms.TextBox();
+            this.findTxt = new System.Windows.Forms.ComboBox();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.checkNoneRdo = new System.Windows.Forms.RadioButton();
             this.checkcCustomeRdo = new System.Windows.Forms.RadioButton();
@@ -124,13 +127,12 @@ namespace FindReplaceEx
             this.autoChk = new System.Windows.Forms.CheckBox();
             this.autoFeedChk = new System.Windows.Forms.CheckBox();
             this.checkAllRdo = new System.Windows.Forms.RadioButton();
-            this.findBtn = new System.Windows.Forms.Button();
             this.regexHelpBtn = new System.Windows.Forms.Button();
             this.regexpChk = new System.Windows.Forms.CheckBox();
             this.wholeWordChk = new System.Windows.Forms.CheckBox();
             this.matchCaseChk = new System.Windows.Forms.CheckBox();
             this.ofrBtn = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
+            this.clearReplaceTxt = new System.Windows.Forms.Button();
             this.copyFindReplaceBtn = new System.Windows.Forms.Button();
             this.replaceBtn = new System.Windows.Forms.Button();
             this.switchFindReplaceBtn = new System.Windows.Forms.Button();
@@ -147,18 +149,18 @@ namespace FindReplaceEx
             this.foldersPage = new System.Windows.Forms.TabPage();
             this.folderTxt = new System.Windows.Forms.ComboBox();
             this.operationsPage = new System.Windows.Forms.TabPage();
+            this.CopyResultsBtn = new System.Windows.Forms.Button();
             this.resultsLbl = new System.Windows.Forms.Label();
             this.filterGroup = new System.Windows.Forms.GroupBox();
-            this.at = new System.Windows.Forms.ColumnHeader();
+            this.at = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.resultsLst = new System.Windows.Forms.ListView();
-            this.mark = new System.Windows.Forms.ColumnHeader();
-            this.result = new System.Windows.Forms.ColumnHeader();
-            this.filename = new System.Windows.Forms.ColumnHeader();
-            this.columnLineNum = new System.Windows.Forms.ColumnHeader();
-            this.columnFileName = new System.Windows.Forms.ColumnHeader();
-            this.columnLineText = new System.Windows.Forms.ColumnHeader();
+            this.mark = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.result = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.filename = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.fileBrowserDlg = new System.Windows.Forms.FolderBrowserDialog();
             this.findGroup = new System.Windows.Forms.GroupBox();
+            this.splitter = new Splitter();
+            this.optionsPanel = new Panel();
             this.tabControl.SuspendLayout();
             this.optionsPage.SuspendLayout();
             this.replacePage.SuspendLayout();
@@ -168,23 +170,27 @@ namespace FindReplaceEx
             this.filterGroup.SuspendLayout();
             this.findGroup.SuspendLayout();
             this.SuspendLayout();
+            this.hideLeftSide();
             // 
             // findTxt
             // 
-            this.findTxt.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this.findTxt.Location = new System.Drawing.Point(312, 4);
+            this.findTxt.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.findTxt.IntegralHeight = false;
+            //this.findTxt.Location = new System.Drawing.Point(374, 4);
             this.findTxt.Name = "findTxt";
-            this.findTxt.Size = new System.Drawing.Size(476, 20);
+            //this.findTxt.Size = new System.Drawing.Size(216, 21);
+            this.findTxt.Dock = DockStyle.Top;
             this.findTxt.TabIndex = 0;
-            this.findTxt.WordWrap = false;
+            this.findTxt.SelectedValueChanged += new System.EventHandler(this.selectedItemFindTxt);
             this.findTxt.TextChanged += new System.EventHandler(this.FindTxtTextChanged);
+            this.findTxt.KeyDown += new System.Windows.Forms.KeyEventHandler(this.keyDownHandler);
             // 
             // checkNoneRdo
             // 
             this.checkNoneRdo.AutoSize = true;
             this.checkNoneRdo.BackColor = System.Drawing.Color.Transparent;
-            this.checkNoneRdo.Location = new System.Drawing.Point(261, 13);
+            this.checkNoneRdo.Location = new System.Drawing.Point(314, 16);
             this.checkNoneRdo.Margin = new System.Windows.Forms.Padding(0);
             this.checkNoneRdo.Name = "checkNoneRdo";
             this.checkNoneRdo.Size = new System.Drawing.Size(51, 17);
@@ -198,7 +204,7 @@ namespace FindReplaceEx
             // 
             this.checkcCustomeRdo.AutoSize = true;
             this.checkcCustomeRdo.BackColor = System.Drawing.Color.Transparent;
-            this.checkcCustomeRdo.Location = new System.Drawing.Point(159, 13);
+            this.checkcCustomeRdo.Location = new System.Drawing.Point(182, 16);
             this.checkcCustomeRdo.Margin = new System.Windows.Forms.Padding(0);
             this.checkcCustomeRdo.Name = "checkcCustomeRdo";
             this.checkcCustomeRdo.Size = new System.Drawing.Size(66, 17);
@@ -213,15 +219,15 @@ namespace FindReplaceEx
             this.checkFileRdo.AutoSize = true;
             this.checkFileRdo.BackColor = System.Drawing.Color.Transparent;
             this.checkFileRdo.Checked = true;
-            this.checkFileRdo.Location = new System.Drawing.Point(2, 13);
+            this.checkFileRdo.Location = new System.Drawing.Point(2, 16);
             this.checkFileRdo.Margin = new System.Windows.Forms.Padding(0);
             this.checkFileRdo.Name = "checkFileRdo";
             this.checkFileRdo.Size = new System.Drawing.Size(41, 17);
             this.checkFileRdo.TabIndex = 4;
-            this.checkFileRdo.TabStop = true;
+            this.checkFileRdo.TabStop = false;
             this.checkFileRdo.Text = "File";
             this.toolTip.SetToolTip(this.checkFileRdo, "Check all the entries of the current file. (Same as All if \"search all opened fil" +
-                    "es\" is unchecked)");
+        "es\" is unchecked)");
             this.checkFileRdo.UseVisualStyleBackColor = false;
             this.checkFileRdo.CheckedChanged += new System.EventHandler(this.CheckRdoCheckedChanged);
             // 
@@ -229,7 +235,7 @@ namespace FindReplaceEx
             // 
             this.checkSelectonRdo.AutoSize = true;
             this.checkSelectonRdo.BackColor = System.Drawing.Color.Transparent;
-            this.checkSelectonRdo.Location = new System.Drawing.Point(43, 13);
+            this.checkSelectonRdo.Location = new System.Drawing.Point(46, 16);
             this.checkSelectonRdo.Margin = new System.Windows.Forms.Padding(0);
             this.checkSelectonRdo.Name = "checkSelectonRdo";
             this.checkSelectonRdo.Size = new System.Drawing.Size(69, 17);
@@ -243,7 +249,7 @@ namespace FindReplaceEx
             // 
             this.checkFilterRdo.AutoSize = true;
             this.checkFilterRdo.BackColor = System.Drawing.Color.Transparent;
-            this.checkFilterRdo.Location = new System.Drawing.Point(112, 13);
+            this.checkFilterRdo.Location = new System.Drawing.Point(121, 16);
             this.checkFilterRdo.Margin = new System.Windows.Forms.Padding(0);
             this.checkFilterRdo.Name = "checkFilterRdo";
             this.checkFilterRdo.Size = new System.Drawing.Size(47, 17);
@@ -260,8 +266,9 @@ namespace FindReplaceEx
             this.folderFilesChk.Size = new System.Drawing.Size(108, 24);
             this.folderFilesChk.TabIndex = 9;
             this.folderFilesChk.Text = "All Files in Folder";
+            this.folderFilesChk.ThreeState = true;
             this.toolTip.SetToolTip(this.folderFilesChk, "Check this to set the next search to be in alll files in the above directory.");
-            this.folderFilesChk.CheckedChanged += new System.EventHandler(this.FolderFilesChkCheckedChanged);
+            this.folderFilesChk.CheckStateChanged += new System.EventHandler(this.FolderFilesChkCheckedStateChanged);
             // 
             // browseBtn
             // 
@@ -283,7 +290,7 @@ namespace FindReplaceEx
             this.searchSubfoldersChk.TabIndex = 9;
             this.searchSubfoldersChk.Text = "Subfolders";
             this.toolTip.SetToolTip(this.searchSubfoldersChk, "Also search in subfolders.");
-            this.searchSubfoldersChk.CheckedChanged += new System.EventHandler(this.FolderFilesChkCheckedChanged);
+            this.searchSubfoldersChk.CheckedChanged += new System.EventHandler(this.FolderFilesChkCheckedStateChanged);
             // 
             // fileMaskTxt
             // 
@@ -291,17 +298,15 @@ namespace FindReplaceEx
             this.fileMaskTxt.Name = "fileMaskTxt";
             this.fileMaskTxt.Size = new System.Drawing.Size(48, 20);
             this.fileMaskTxt.TabIndex = 10;
-            this.fileMaskTxt.Text = "*.as";
             this.toolTip.SetToolTip(this.fileMaskTxt, "Specify the file mask to search in.");
             // 
             // openFilesChk
             // 
             this.openFilesChk.Checked = true;
             this.openFilesChk.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.openFilesChk.Location = new System.Drawing.Point(8, 8);
             this.openFilesChk.Name = "openFilesChk";
-            this.openFilesChk.Size = new System.Drawing.Size(142, 24);
             this.openFilesChk.TabIndex = 9;
+            this.openFilesChk.Dock = DockStyle.Top;
             this.openFilesChk.Text = "All Opened Files";
             this.toolTip.SetToolTip(this.openFilesChk, "Show the reslts from all opened files.");
             this.openFilesChk.CheckedChanged += new System.EventHandler(this.OptionsChkCheckedChanged);
@@ -311,9 +316,8 @@ namespace FindReplaceEx
             this.autoChk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.autoChk.Checked = true;
             this.autoChk.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.autoChk.Location = new System.Drawing.Point(161, 28);
             this.autoChk.Name = "autoChk";
-            this.autoChk.Size = new System.Drawing.Size(135, 16);
+            this.autoChk.Dock = DockStyle.Top;
             this.autoChk.TabIndex = 4;
             this.autoChk.Tag = "";
             this.autoChk.Text = "Automatic find";
@@ -323,9 +327,8 @@ namespace FindReplaceEx
             // 
             this.autoFeedChk.Checked = true;
             this.autoFeedChk.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.autoFeedChk.Location = new System.Drawing.Point(161, 8);
             this.autoFeedChk.Name = "autoFeedChk";
-            this.autoFeedChk.Size = new System.Drawing.Size(135, 18);
+            this.autoFeedChk.Dock = DockStyle.Top;
             this.autoFeedChk.TabIndex = 21;
             this.autoFeedChk.Tag = "";
             this.autoFeedChk.Text = "Update as you type";
@@ -335,7 +338,7 @@ namespace FindReplaceEx
             // 
             this.checkAllRdo.AutoSize = true;
             this.checkAllRdo.BackColor = System.Drawing.Color.Transparent;
-            this.checkAllRdo.Location = new System.Drawing.Point(225, 13);
+            this.checkAllRdo.Location = new System.Drawing.Point(264, 16);
             this.checkAllRdo.Margin = new System.Windows.Forms.Padding(0);
             this.checkAllRdo.Name = "checkAllRdo";
             this.checkAllRdo.Size = new System.Drawing.Size(36, 17);
@@ -344,17 +347,6 @@ namespace FindReplaceEx
             this.toolTip.SetToolTip(this.checkAllRdo, "Check all the entries to replace");
             this.checkAllRdo.UseVisualStyleBackColor = false;
             this.checkAllRdo.CheckedChanged += new System.EventHandler(this.CheckRdoCheckedChanged);
-            // 
-            // findBtn
-            // 
-            this.findBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.findBtn.Location = new System.Drawing.Point(794, 2);
-            this.findBtn.Name = "findBtn";
-            this.findBtn.Size = new System.Drawing.Size(56, 22);
-            this.findBtn.TabIndex = 1;
-            this.findBtn.Text = "Find";
-            this.toolTip.SetToolTip(this.findBtn, "Find the wanted phrase");
-            this.findBtn.Click += new System.EventHandler(this.FindBtnClick);
             // 
             // regexHelpBtn
             // 
@@ -369,7 +361,7 @@ namespace FindReplaceEx
             // regexpChk
             // 
             this.regexpChk.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.regexpChk.Location = new System.Drawing.Point(178, 12);
+            this.regexpChk.Location = new System.Drawing.Point(189, 12);
             this.regexpChk.Name = "regexpChk";
             this.regexpChk.Size = new System.Drawing.Size(54, 24);
             this.regexpChk.TabIndex = 4;
@@ -381,7 +373,7 @@ namespace FindReplaceEx
             // wholeWordChk
             // 
             this.wholeWordChk.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.wholeWordChk.Location = new System.Drawing.Point(92, 12);
+            this.wholeWordChk.Location = new System.Drawing.Point(99, 12);
             this.wholeWordChk.Name = "wholeWordChk";
             this.wholeWordChk.Size = new System.Drawing.Size(84, 24);
             this.wholeWordChk.TabIndex = 3;
@@ -392,7 +384,7 @@ namespace FindReplaceEx
             // matchCaseChk
             // 
             this.matchCaseChk.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.matchCaseChk.Location = new System.Drawing.Point(4, 12);
+            this.matchCaseChk.Location = new System.Drawing.Point(11, 12);
             this.matchCaseChk.Name = "matchCaseChk";
             this.matchCaseChk.Size = new System.Drawing.Size(88, 24);
             this.matchCaseChk.TabIndex = 2;
@@ -414,19 +406,19 @@ namespace FindReplaceEx
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(96, 32);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(40, 27);
-            this.button1.TabIndex = 7;
-            this.button1.Text = "Clear";
-            this.toolTip.SetToolTip(this.button1, "Copies the text from the find box");
-            this.button1.Click += new System.EventHandler(this.Button1Click);
+            this.clearReplaceTxt.Location = new System.Drawing.Point(this.copyFindReplaceBtn.Location.X + this.copyFindReplaceBtn.Size.Width+30, 32);
+            this.clearReplaceTxt.Name = "button1";
+            this.clearReplaceTxt.Size = new System.Drawing.Size(45, 27);
+            this.clearReplaceTxt.TabIndex = 7;
+            this.clearReplaceTxt.Text = "Clear";
+            this.toolTip.SetToolTip(this.clearReplaceTxt, "Clear the text from the find box");
+            this.clearReplaceTxt.Click += new System.EventHandler(this.clearReplaceTxtClick);
             // 
             // copyFindReplaceBtn
             // 
-            this.copyFindReplaceBtn.Location = new System.Drawing.Point(56, 32);
+            this.copyFindReplaceBtn.Location = new System.Drawing.Point(this.switchFindReplaceBtn.Location.X + this.switchFindReplaceBtn.Size.Width-15, 32);
             this.copyFindReplaceBtn.Name = "copyFindReplaceBtn";
-            this.copyFindReplaceBtn.Size = new System.Drawing.Size(40, 27);
+            this.copyFindReplaceBtn.Size = new System.Drawing.Size(45, 27);
             this.copyFindReplaceBtn.TabIndex = 7;
             this.copyFindReplaceBtn.Text = "Copy";
             this.toolTip.SetToolTip(this.copyFindReplaceBtn, "Copies the text from the find box");
@@ -446,7 +438,7 @@ namespace FindReplaceEx
             // 
             this.switchFindReplaceBtn.Location = new System.Drawing.Point(8, 32);
             this.switchFindReplaceBtn.Name = "switchFindReplaceBtn";
-            this.switchFindReplaceBtn.Size = new System.Drawing.Size(48, 27);
+            this.switchFindReplaceBtn.Size = new System.Drawing.Size(52, 27);
             this.switchFindReplaceBtn.TabIndex = 7;
             this.switchFindReplaceBtn.Text = "Switch";
             this.toolTip.SetToolTip(this.switchFindReplaceBtn, "Switches the text between find and replace");
@@ -477,13 +469,13 @@ namespace FindReplaceEx
             // regExReplaceChk
             // 
             this.regExReplaceChk.AutoSize = true;
-            this.regExReplaceChk.Location = new System.Drawing.Point(138, 38);
+            this.regExReplaceChk.Location = new System.Drawing.Point(160, 36);
             this.regExReplaceChk.Name = "regExReplaceChk";
             this.regExReplaceChk.Size = new System.Drawing.Size(96, 17);
             this.regExReplaceChk.TabIndex = 8;
             this.regExReplaceChk.Text = "RegEx replace";
             this.toolTip.SetToolTip(this.regExReplaceChk, "If checked, you can use searched groups from the match in your replace. \\n Write " +
-                    "$1 to insert the text from the first group, and so on.");
+        "$1 to insert the text from the first group, and so on.");
             this.regExReplaceChk.UseVisualStyleBackColor = true;
             // 
             // tabControl
@@ -493,10 +485,9 @@ namespace FindReplaceEx
             this.tabControl.Controls.Add(this.filterPage);
             this.tabControl.Controls.Add(this.foldersPage);
             this.tabControl.Controls.Add(this.operationsPage);
-            this.tabControl.Location = new System.Drawing.Point(0, 43);
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
-            this.tabControl.Size = new System.Drawing.Size(312, 90);
+            this.tabControl.Dock = DockStyle.Fill;
             this.tabControl.TabIndex = 5;
             this.tabControl.SelectedIndexChanged += new System.EventHandler(this.TabControlSelectedIndexChanged);
             // 
@@ -519,7 +510,7 @@ namespace FindReplaceEx
             this.replacePage.Controls.Add(this.replaceTxt);
             this.replacePage.Controls.Add(this.replaceBtn);
             this.replacePage.Controls.Add(this.copyFindReplaceBtn);
-            this.replacePage.Controls.Add(this.button1);
+            this.replacePage.Controls.Add(this.clearReplaceTxt);
             this.replacePage.Controls.Add(this.ofrBtn);
             this.replacePage.Location = new System.Drawing.Point(4, 22);
             this.replacePage.Name = "replacePage";
@@ -535,6 +526,7 @@ namespace FindReplaceEx
             this.replaceTxt.Size = new System.Drawing.Size(238, 20);
             this.replaceTxt.TabIndex = 0;
             this.replaceTxt.Text = "@FIND";
+            this.replaceTxt.KeyDown += new System.Windows.Forms.KeyEventHandler(this.keyDownHandler);
             // 
             // filterPage
             // 
@@ -590,10 +582,14 @@ namespace FindReplaceEx
             this.folderTxt.Name = "folderTxt";
             this.folderTxt.Size = new System.Drawing.Size(296, 21);
             this.folderTxt.TabIndex = 2;
+            this.folderTxt.DrawMode = DrawMode.OwnerDrawFixed;
+            this.folderTxt.DrawItem += folderTxt_DrawItem;
+            this.folderTxt.DropDownClosed += folderTxt_DropDownClosed;
             this.folderTxt.SelectedIndexChanged += new System.EventHandler(this.FolderTxtSelectedIndexChanged);
             // 
             // operationsPage
             // 
+            this.operationsPage.Controls.Add(this.CopyResultsBtn);
             this.operationsPage.Controls.Add(this.deleteBtn);
             this.operationsPage.Controls.Add(this.bookmarkBtn);
             this.operationsPage.Location = new System.Drawing.Point(4, 22);
@@ -603,6 +599,16 @@ namespace FindReplaceEx
             this.operationsPage.TabIndex = 3;
             this.operationsPage.Text = "Operations";
             this.operationsPage.UseVisualStyleBackColor = true;
+            // 
+            // CopyResultsBtn
+            // 
+            this.CopyResultsBtn.Location = new System.Drawing.Point(8, 35);
+            this.CopyResultsBtn.Name = "CopyResultsBtn";
+            this.CopyResultsBtn.Size = new System.Drawing.Size(107, 23);
+            this.CopyResultsBtn.TabIndex = 1;
+            this.CopyResultsBtn.Text = "Copy To Results";
+            this.CopyResultsBtn.UseVisualStyleBackColor = true;
+            this.CopyResultsBtn.Click += new System.EventHandler(this.CopyResultsBtn_Click);
             // 
             // resultsLbl
             // 
@@ -624,9 +630,9 @@ namespace FindReplaceEx
             this.filterGroup.Controls.Add(this.checkAllRdo);
             this.filterGroup.Controls.Add(this.checkNoneRdo);
             this.filterGroup.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.filterGroup.Location = new System.Drawing.Point(0, 278);
+            this.filterGroup.Dock = DockStyle.Bottom;
             this.filterGroup.Name = "filterGroup";
-            this.filterGroup.Size = new System.Drawing.Size(312, 43);
+            this.filterGroup.Height = 43;
             this.filterGroup.TabIndex = 11;
             this.filterGroup.TabStop = false;
             this.filterGroup.Text = "Filter";
@@ -634,14 +640,14 @@ namespace FindReplaceEx
             // at
             // 
             this.at.Text = "@";
-            this.at.Width = 51;
+            this.at.Width = -1;
             // 
             // resultsLst
             // 
             this.resultsLst.Alignment = System.Windows.Forms.ListViewAlignment.SnapToGrid;
-            this.resultsLst.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.resultsLst.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.resultsLst.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.mark,
             this.at,
@@ -652,47 +658,34 @@ namespace FindReplaceEx
             this.resultsLst.GridLines = true;
             this.resultsLst.HideSelection = false;
             this.resultsLst.LabelWrap = false;
-            this.resultsLst.Location = new System.Drawing.Point(314, 27);
+            this.resultsLst.Dock = DockStyle.Fill;
             this.resultsLst.Name = "resultsLst";
             this.resultsLst.ShowGroups = false;
-            this.resultsLst.Size = new System.Drawing.Size(540, 291);
             this.resultsLst.TabIndex = 7;
             this.resultsLst.UseCompatibleStateImageBehavior = false;
             this.resultsLst.View = System.Windows.Forms.View.Details;
-            this.resultsLst.DoubleClick += new System.EventHandler(this.ResultsLstDoubleClick);
             this.resultsLst.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ResultsLstItemCheck);
-            this.resultsLst.MouseMove += new System.Windows.Forms.MouseEventHandler(this.ResultsLstMouseMove);
-            this.resultsLst.MouseLeave += new System.EventHandler(this.resultsLst_MouseLeave);
+            this.resultsLst.SelectedIndexChanged += new System.EventHandler(this.resultsLst_SelectedIndexChanged);
             this.resultsLst.Click += new System.EventHandler(this.ResultsLstClick);
+            this.resultsLst.DoubleClick += new System.EventHandler(this.ResultsLstDoubleClick);
+            this.resultsLst.MouseLeave += new System.EventHandler(this.resultsLst_MouseLeave);
+            this.resultsLst.MouseMove += new System.Windows.Forms.MouseEventHandler(this.ResultsLstMouseMove);
+            this.resultsLst.SizeChanged += new EventHandler(this.ResultsLst_SizeChanged);
             // 
             // mark
             // 
             this.mark.Text = "";
-            this.mark.Width = 30;
+            this.mark.Width = -1;
             // 
             // result
             // 
             this.result.Text = "Result Line";
-            this.result.Width = 260;
+            this.result.Width = -1;
             // 
             // filename
             // 
             this.filename.Text = "File Name";
-            // 
-            // columnLineNum
-            // 
-            this.columnLineNum.Text = "@";
-            this.columnLineNum.Width = 35;
-            // 
-            // columnFileName
-            // 
-            this.columnFileName.Text = "File Name";
-            this.columnFileName.Width = 87;
-            // 
-            // columnLineText
-            // 
-            this.columnLineText.Text = "Line Text";
-            this.columnLineText.Width = 351;
+            this.filename.Width = -1;
             // 
             // findGroup
             // 
@@ -700,24 +693,27 @@ namespace FindReplaceEx
             this.findGroup.Controls.Add(this.wholeWordChk);
             this.findGroup.Controls.Add(this.regexpChk);
             this.findGroup.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.findGroup.Location = new System.Drawing.Point(0, 0);
             this.findGroup.Name = "findGroup";
-            this.findGroup.Size = new System.Drawing.Size(312, 41);
+            this.findGroup.Height = 41;
+            this.findGroup.Dock = DockStyle.Top;
             this.findGroup.TabIndex = 4;
             this.findGroup.TabStop = false;
             this.findGroup.Text = "Find";
             // 
+            // optionsPanel
+            // 
+            this.optionsPanel.Controls.Add(tabControl);
+            this.optionsPanel.Controls.Add(findGroup);
+            this.optionsPanel.Controls.Add(findTxt);
+            this.optionsPanel.Controls.Add(filterGroup);
+            this.optionsPanel.Size = new Size(375,200);
+            // 
             // PluginUI
             // 
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.Controls.Add(this.findGroup);
-            this.Controls.Add(this.findBtn);
-            this.Controls.Add(this.filterGroup);
-            this.Controls.Add(this.findTxt);
-            this.Controls.Add(this.tabControl);
-            this.Controls.Add(this.resultsLst);
+            this.Controls.AddRange(new Control[] { this.resultsLst, this.splitter,this.optionsPanel });
             this.Name = "PluginUI";
-            this.Size = new System.Drawing.Size(854, 322);
+            this.Size = new System.Drawing.Size(656, 322);
             this.tabControl.ResumeLayout(false);
             this.optionsPage.ResumeLayout(false);
             this.replacePage.ResumeLayout(false);
@@ -730,9 +726,8 @@ namespace FindReplaceEx
             this.filterGroup.PerformLayout();
             this.findGroup.ResumeLayout(false);
             this.ResumeLayout(false);
-            this.PerformLayout();
-
 		}
+
 		#endregion
 		
 		#region settings and updates
@@ -747,7 +742,7 @@ namespace FindReplaceEx
             autoChk.Checked = settingsObject.FindAsYouType;
 			//resizeToFit = resize;
 			ChangeFilterPresets(settingsObject.FilterPresets);
-
+            findTxt.MaxDropDownItems = settingsObject.SearchHistoryLimit;
             resultsLst.ShowGroups = settingsObject.GroupByFile;
 		}
 		
@@ -779,79 +774,51 @@ namespace FindReplaceEx
 			{
 				ShowReplaceMode(false);
 				plugin.UpdateProjectClassPaths();
-				folderFilesChk.Checked = true;
+                if (folderFilesChk.CheckState == CheckState.Unchecked)
+                {
+                    folderFilesChk.CheckState = CheckState.Checked;
+                }
 			}
-			else
-			{
-				folderFilesChk.Checked = false;
-			}
-		}
-		
-        /// <summary>
-        /// focus the find text box
-        /// </summary>
-		public void EnableFocus()
-		{
-			EnableFocus(false);
-		}
-		
-        /// <summary>
-        /// focus in the find or the replace input box
-        /// </summary>
-        /// <param name="replace">if true - focus on the replace</param>
-		public void EnableFocus(bool replace)
-		{
-			this.plugin.Panel.Show();
-			
-			if (!replace)
-			{
-				findTxt.Focus();
-			}
-			else
-			{
-				ShowReplace = true;
-				replaceTxt.Focus();
+			else if (folderFilesChk.CheckState != CheckState.Indeterminate)
+			{               
+                    folderFilesChk.CheckState = CheckState.Unchecked;
 			}
 		}
 		
         /// <summary>
-        /// save the status of the panel
+        /// handle with focus
         /// </summary>
-		private void SaveState()
-		{
-			if (state.IndexOf("<>") == 0)
-			{
-				string pState = "";
-				if (autoChk.Checked)
-					pState += "A";
-				if (autoFeedChk.Checked)
-					pState += "F";
-				if (MatchCase)
-					pState += "I";
-				if (WholeWord)
-					pState += "W";
-				if (RegExp)
-					pState += "R";
-				if (openFilesChk.Checked)
-					pState += "O";
-				state = pState;
-			}
-		}
-		
-        /// <summary>
-        /// restore the status of the panel, after some operations that changed it
-        /// </summary>
-		private void RestoreState()
-		{
-			autoChk.Checked = state.IndexOf("A") > -1;
-			autoFeedChk.Checked = state.IndexOf("F") > -1;
-			MatchCase = state.IndexOf("I") > -1;
-			WholeWord = state.IndexOf("W") > -1;
-			RegExp = state.IndexOf("R") > -1;
-			openFilesChk.Checked = state.IndexOf("O") > -1;
-			state = "<>";
-		}
+        public void PluginUI_FocusHandle(object sender, EventArgs e)
+        {
+            
 
+            if (PluginBase.MainForm.DockPanel.ActiveContent == this.plugin.Panel)
+            {
+                revealLeftSide();      
+                findTxt.Focus();
+            }
+            else
+            {
+                if (sender == null)
+                {
+                    this.plugin.Panel.Show();
+                    revealLeftSide();
+                    this.ShowReplace = true;
+                    this.replaceTxt.Focus();
+                }
+                else
+                {
+                    Settings settingsObject = this.plugin.Settings as Settings;
+                    if ((tabControl.SelectedTab == optionsPage && settingsObject.ResizeOptionsTab) || (tabControl.SelectedTab == replacePage && settingsObject.ResizeReplaceTab) || (tabControl.SelectedTab == filterPage && settingsObject.ResizeFilterTab) || (tabControl.SelectedTab == foldersPage && settingsObject.ResizeFoldersTab) || (tabControl.SelectedTab == operationsPage && settingsObject.ResizeOperationsTab))
+                    {
+                        tabControl.SelectedTab = optionsPage;
+                        hideLeftSide();
+                    }
+                }              
+            }
+
+        }
+		
         /// <summary>
         /// Stops the parse timer if not enabled.
         /// </summary>
@@ -897,8 +864,6 @@ namespace FindReplaceEx
 		///</summary>
 		public void ListAllResults(FindResults results)
 		{
-			if (state.IndexOf("<>") == 0)
-			{
 				resultsLst.BeginUpdate();
 				resultsLst.Items.Clear();
                 resultsLst.Groups.Clear();
@@ -924,10 +889,25 @@ namespace FindReplaceEx
 //				if (resultsLst.Items.Count > 0)
 //					resultsLst.EnsureVisible(resultsLst.Items.Count-1);
 				CheckListItems();
+                this.mark.Width = -1;
+                this.at.Width = -1;
+                this.filename.Width = -1;
 				resultsLst.EndUpdate();
-			}
 		}
-		
+
+        private void startSearch()
+        {
+            bool itemExists = false;
+            foreach (string cbi in findTxt.Items)
+            {
+                itemExists = cbi == findTxt.Text;
+                if (itemExists) break;
+            }
+            if (!itemExists)
+                findTxt.Items.Add(findTxt.Text);
+            ListAllFindText(findTxt.Text, 1);
+        }
+
 		///<summary>
 		/// Finds a text in open document, or all open documents and list it.
         /// using text in find input box
@@ -958,10 +938,13 @@ namespace FindReplaceEx
 				resultsLst.Tag = folderFilesChk.Checked ? "V": "X";
 				DefaultReplaceCheck();
 				FindResults results;
-				if (folderFilesChk.Checked)
+                if ((folderFilesChk.CheckState == CheckState.Checked || folderFilesChk.CheckState == CheckState.Indeterminate) && tabControl.SelectedTab == foldersPage)
 				{
 					results = plugin.GetFindInFolderResultsList(Text, folderTxt.Text, fileMaskTxt.Text, searchSubfoldersChk.Checked);
-					folderFilesChk.Checked = false;
+                    if (folderFilesChk.CheckState == CheckState.Checked)
+                    {
+                        folderFilesChk.CheckState = CheckState.Unchecked;
+                    }
 				}
 				else if (openFilesChk.Checked)
 				{
@@ -1042,48 +1025,48 @@ namespace FindReplaceEx
         /// </summary>
 		private void CheckListItems()
 		{
-			if (state.IndexOf("<>") == 0)
-			{
-				try
-				{
-					string curFile = plugin.CurFile;
-					string filterText = filterTxt.Tag as string;
-					foreach (ListViewItem item in resultsLst.Items)
-					{
-						FindMatch m = item.Tag as FindMatch;
-						if (checkAllRdo.Checked)
-						{
-							item.Checked = true;
-						}
-						else if (checkNoneRdo.Checked)
-						{
-							item.Checked = false;
-						}
-						else if (checkFileRdo.Checked)
-						{
-							item.Checked = (m.FileName == curFile);
-						}
-						else if (checkSelectonRdo.Checked)
-						{
-							int selStaert = m.Scintilla.SelectionStart;
-							int selEnd = m.Scintilla.SelectionEnd;
-							bool inRange = m.Position > selStaert & m.Position < selEnd;
-							item.Checked = (m.FileName == curFile) & inRange;
-						}
-						else if (checkFilterRdo.Checked)
-						{
-							item.Checked = IsMatchInItem(item, 2, filterText);
-							
-						}
+            if (!inReplace)
+            {
+                try
+                {
+                    string curFile = plugin.CurFile;
+                    string filterText = filterTxt.Tag as string;
+                    foreach (ListViewItem item in resultsLst.Items)
+                    {
+                        FindMatch m = item.Tag as FindMatch;
+                        if (checkAllRdo.Checked)
+                        {
+                            item.Checked = true;
+                        }
+                        else if (checkNoneRdo.Checked)
+                        {
+                            item.Checked = false;
+                        }
+                        else if (checkFileRdo.Checked)
+                        {
+                            item.Checked = (m.FileName == curFile);
+                        }
+                        else if (checkSelectonRdo.Checked)
+                        {
+                            int selStaert = m.Scintilla.SelectionStart;
+                            int selEnd = m.Scintilla.SelectionEnd;
+                            bool inRange = m.Position > selStaert & m.Position < selEnd;
+                            item.Checked = (m.FileName == curFile) & inRange;
+                        }
+                        else if (checkFilterRdo.Checked)
+                        {
+                            item.Checked = IsMatchInItem(item, 2, filterText);
+
+                        }
                         HilightItem(item, item.Checked);
-					}
-					UpdateStatusBar();
-				}
-				catch
-				{
-					checkNoneRdo.Checked = true;
-				}
-			}
+                    }
+                    UpdateStatusBar();
+                }
+                catch
+                {
+                    checkNoneRdo.Checked = true;
+                }
+            }
 		}
 		
         /// <summary>
@@ -1120,10 +1103,10 @@ namespace FindReplaceEx
             ITabbedDocument document = PluginBase.MainForm.CurrentDocument;
             ScintillaControl doc = document.SciControl;
 
-			SaveState();
-			autoFeedChk.Checked = false;
-			autoChk.Checked = false;
+			//autoFeedChk.Checked = false;
+			//autoChk.Checked = false;
 			string workingFile = "";
+            inReplace = true;
 			if (replaceShown && replaceText != "")
 			{
                 document = PluginBase.MainForm.CurrentDocument;
@@ -1156,7 +1139,7 @@ namespace FindReplaceEx
 				doc.EndUndoAction();
 				
 			}
-			RestoreState();
+            inReplace = false;
 			ShowOfr();
 		}
 
@@ -1178,7 +1161,6 @@ namespace FindReplaceEx
         /// </summary>
 		private void OpenAndResearch()
 		{
-			SaveState();
 			string findText = findTxt.Text;
 			string workingFile = "";
 			int numOfEntries = resultsLst.Items.Count;
@@ -1195,7 +1177,6 @@ namespace FindReplaceEx
 					}
 				}
 			}
-			RestoreState();
 			ListAllFindText(findText);
 			ShowOfr();
 		}
@@ -1218,8 +1199,8 @@ namespace FindReplaceEx
         {
 			resultsLst.BeginUpdate();
             resultsLst.Visible = false;
-				resultsLst.CheckBoxes = false;
-				resultsLst.MultiSelect = false;
+		    resultsLst.CheckBoxes = false;
+			resultsLst.MultiSelect = false;
             resultsLst.Visible = true;
             resultsLst.EndUpdate();
         }
@@ -1231,8 +1212,8 @@ namespace FindReplaceEx
         {
 			resultsLst.BeginUpdate();
             resultsLst.Visible = false;
-				resultsLst.CheckBoxes = true;
-				resultsLst.MultiSelect = true;
+			resultsLst.CheckBoxes = true;
+			resultsLst.MultiSelect = true;
 			CheckListItems();
             resultsLst.Visible = true;
             resultsLst.EndUpdate();
@@ -1417,7 +1398,6 @@ namespace FindReplaceEx
             ITabbedDocument document = PluginBase.MainForm.CurrentDocument;
             ScintillaControl doc = document.SciControl;
 
-			SaveState();
     		string workingFile = "";
 			doc.BeginUndoAction();
 			int numOfEntries = resultsLst.Items.Count;
@@ -1441,8 +1421,25 @@ namespace FindReplaceEx
 				}
 			}
 
-            RestoreState();
-			ShowOfr();
+            
+            ShowReplace = false;
+        }
+
+        private void CopyToResultsPanel()
+        {
+            Globals.MainForm.CallCommand("PluginCommand", "ResultsPanel.ClearResults");
+            foreach (ListViewItem item in resultsLst.Items)
+            {
+                FindMatch m = item.Tag as FindMatch;
+                int column = m.Column;
+                if (item.Checked)
+                {
+                    TraceManager.Add(m.FileName + ":" + (m.Line + 1).ToString() + ": characters " + m.Column + "-" + (m.Column + m.Text.Length) + " : " + m.LineText.Trim(), (Int32)TraceType.Info);
+                }
+            }
+            Globals.MainForm.CallCommand("PluginCommand", "ResultsPanel.ShowResults");
+
+            ShowReplace = false;
         }
 
         /// <summary>
@@ -1453,7 +1450,6 @@ namespace FindReplaceEx
             ITabbedDocument document = PluginBase.MainForm.CurrentDocument;
             ScintillaControl doc = document.SciControl;
 
-			SaveState();
     		string workingFile = "";
 			doc.BeginUndoAction();
 			int numOfEntries = resultsLst.Items.Count;
@@ -1478,9 +1474,7 @@ namespace FindReplaceEx
 			}
 
 			doc.EndUndoAction();
-            RestoreState();
-			ShowOfr();
-
+            ShowReplace = false;
         }
         #endregion
 
@@ -1540,11 +1534,6 @@ namespace FindReplaceEx
 		#endregion
 		
 		#region Controlls Events
-		private void FindBtnClick(object sender, System.EventArgs e)
-		{
-			ListAllFindText(findTxt.Text, 1);
-			//CheckListItems();
-		}
 		
 		private void ResultsLstDoubleClick(object sender, System.EventArgs e)
 		{
@@ -1556,7 +1545,19 @@ namespace FindReplaceEx
 			
 			plugin.GotoPosAndFocus(m.FileName, position, m.Text.Length);
 		}
-		
+
+        private void keyDownHandler(object sender, KeyEventArgs e)
+        {
+            if (findTxt.Focused && e.KeyCode == Keys.Enter)
+            {
+                startSearch();
+            }
+            else if (replaceTxt.Focused && e.KeyCode == Keys.Enter)
+            {
+                ReplaceBtnClick(null, null);
+            }
+        }
+
 		private void FindTxtTextChanged(object sender, System.EventArgs e)
 		{
 			if(autoChk.Checked)
@@ -1579,7 +1580,7 @@ namespace FindReplaceEx
 			int curPosition = plugin.CurPosition;
 			replace = Regex.Replace(replace, "@FIND", find);
 			ReplaceSelectedEntries(replace);
-			//ListAllFindText(replace);
+            ListAllFindText(find, 1);
 			//replaceTxt.Text = "@FIND";
 //			if (plugin.HideReplace)
 //				ShowReplace = false;
@@ -1644,24 +1645,44 @@ namespace FindReplaceEx
 				folderTxt.Text = fileBrowserDlg.SelectedPath;
 		}
 		
-		private void FolderFilesChkCheckedChanged(object sender, System.EventArgs e)
+		private void FolderFilesChkCheckedStateChanged(object sender, System.EventArgs e)
 		{
-			if (folderFilesChk.Checked) 
-			{
-				SaveState();
-			}
-			else
-			{
-				RestoreState();
-			}
-			autoChk.Checked = !folderFilesChk.Checked;
+            switch (folderFilesChk.CheckState)
+            {
+                case CheckState.Checked: 
+                        autoChk.Checked = !folderFilesChk.Checked;
+                        break;
+                case CheckState.Indeterminate:
+                                                
+                        break;
+                case CheckState.Unchecked:
+                        autoChk.Checked = !folderFilesChk.Checked;
+                        break;
+            }
 		}
-		
+
 		private void FolderTxtSelectedIndexChanged(object sender, System.EventArgs e)
 		{
 			lastPath = folderTxt.Text;
 		}
-		
+
+        private void folderTxt_DropDownClosed(object sender, EventArgs e)
+        {
+            toolTip.Hide(folderTxt);
+        }
+
+        private void folderTxt_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            if (e.Index < 0) { return; }
+            string text = folderTxt.GetItemText(folderTxt.Items[e.Index]);
+            e.DrawBackground();
+            using (SolidBrush br = new SolidBrush(e.ForeColor))
+            { e.Graphics.DrawString(text, e.Font, br, e.Bounds); }
+            if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
+            { toolTip.Show(text, folderTxt, e.Bounds.Left, e.Bounds.Top); }
+            e.DrawFocusRectangle();
+        }
+
 		private void TabControlSelectedIndexChanged(object sender, System.EventArgs e)
 		{
 			TabPage selected = tabControl.SelectedTab;
@@ -1675,7 +1696,7 @@ namespace FindReplaceEx
 		{
 			replaceTxt.Text = findTxt.Text;
 		}
-		void Button1Click(object sender, System.EventArgs e)
+		void clearReplaceTxtClick(object sender, System.EventArgs e)
 		{
 			replaceTxt.Text = "@FIND";
 		}
@@ -1696,38 +1717,60 @@ namespace FindReplaceEx
 			// display entry details (filename, line, description)
 			ListViewItem item = resultsLst.GetItemAt(e.X, e.Y);
 			if (item == null) {
-				toolTip.SetToolTip(resultsLst, "");
+                toolTip.Hide(resultsLst);
+                toolTipShow = false;
+                currentItem = null;
 				return;
-			}
-			FindMatch m = (item.Tag) as FindMatch;
-			ScintillaControl sci = m.Scintilla;
-			int line =  m.Line;
-			string tooltipText = String.Format("{1}    {0}:\n",item.SubItems[1].Text,item.SubItems[3].Text);
-			if (sci != null)
-			{
-                if (m.FileName == plugin.CurFile)
+		    }
+            if(toolTipShow){
+                if (currentItem.Index == item.Index)
                 {
-                    ASCompletion.Completion.ASResult res = ASCompletion.Context.ASContext.Context.GetDeclarationAtLine(line);
-                    tooltipText += String.Format("In       {0}:\n", res.Member);
+                    return;
                 }
-
-
-
-				string prev = sci.GetLine(line-1).Trim();
-				string next = sci.GetLine(line+1).Trim();
-				tooltipText += String.Format("\n   {1}\n        {0}\n   {2} ", item.SubItems[2].Text, prev, next);
-			}
-			else
-			{
-				tooltipText += item.SubItems[2].Text;
-			}
-			toolTip.SetToolTip(resultsLst,tooltipText);
+            }else{
+                FindMatch m = (item.Tag) as FindMatch;
+                ScintillaControl sci = m.Scintilla;
+                int line = m.Line;
+                string tooltipText = String.Format("{1}    {0}:\n", item.SubItems[1].Text, item.SubItems[3].Text);
+                //if (sci != null)
+                try
+                {
+                    if (m.FileName == plugin.CurFile && m.FileName.Contains(".as"))
+                    {
+                        ASCompletion.Completion.ASResult res = ASCompletion.Context.ASContext.Context.GetDeclarationAtLine(line);
+                        tooltipText += String.Format("In       {0}:\n", res.Member);
+                    }
+                    string prev = sci.GetLine(line - 1).Trim();
+                    string next = sci.GetLine(line + 1).Trim();
+                    tooltipText += String.Format("\n   {1}\n        {0}\n   {2} ", item.SubItems[2].Text, prev, next);
+                }
+                //else
+                catch
+                {
+                    tooltipText += item.SubItems[2].Text;
+                }
+                toolTip.SetToolTip(resultsLst, tooltipText);
+                toolTipShow = true;
+                currentItem = item;
+            }
 		}
+
+        private void ResultsLst_SizeChanged(object sender, EventArgs e)
+        {
+            ListView resultsList = sender as ListView;
+            resultsList.Columns[2].Width = resultsList.Width - resultsList.Columns[0].Width - resultsList.Columns[1].Width - resultsList.Columns[3].Width;
+        }
 
         private void bookmarkBtn_Click(object sender, EventArgs e)
         {
             BookmarkSearchResults();
         }
+
+        private void CopyResultsBtn_Click(object sender, EventArgs e)
+        {
+            CopyToResultsPanel();
+        }
+
 
         private void deleteBtn_Click(object sender, EventArgs e)
         {
@@ -1741,8 +1784,26 @@ namespace FindReplaceEx
             filterTxt.Text = "";
         }
 
+        public void DockHandler_DockStateChanged(object sender, EventArgs e)
+        {
+            DockContentHandler dckContHandler = sender as DockContentHandler;
+            switch (dckContHandler.DockState)
+            {
+                case DockState.DockBottom:
+                case DockState.Float:
+                case DockState.DockTop:
+                    this.optionsPanel.Dock = DockStyle.Left;
+                    this.splitter.Dock = DockStyle.Left;
+                    break;
+                case DockState.DockRight:
+                case DockState.DockLeft:
+                    this.optionsPanel.Dock = DockStyle.Top;
+                    this.splitter.Dock = DockStyle.Top;
+                    break;
+            }
+        }
 
-		#endregion
+        #endregion
 
         private void regexpChk_CheckedChanged(object sender, EventArgs e)
         {
@@ -1751,8 +1812,40 @@ namespace FindReplaceEx
 
         private void resultsLst_MouseLeave(object sender, EventArgs e)
         {
-            ASCompletion.Context.ASContext.Context.CurrentFile = plugin.CurFile;
+            currentItem = null;
+            toolTipShow = false;
+            // needs research... if I want to change the context of the current file while running
+            //ASCompletion.Context.ASContext.Context.CurrentFile = plugin.CurFile;
         }
 
-	}
+        private void selectedItemFindTxt(object sender, EventArgs e)
+        {
+            ListAllFindText(findTxt.Text, 1);
+        }
+
+        private void hideLeftSide()
+        {            
+            this.optionsPanel.Visible = false;
+            this.splitter.Visible = false;
+            
+        }
+
+        private void revealLeftSide()
+        {
+            this.optionsPanel.Visible = true;
+            this.splitter.Visible = true;
+            //this.resultsLst.Size = new System.Drawing.Size(450, 291);
+        }
+
+        public void setFilterMaskTxt(string ext)
+        {
+            this.fileMaskTxt.Text = "*."+ext;
+        }
+
+        private void resultsLst_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            
+        }
+
+    }
 }

@@ -20,11 +20,12 @@ namespace FindReplaceEx
 		private Match match;
 		private string fileName;
 		private ScintillaControl scintilla;
-		private int position;
+		private Int32 position;
+        private int column;
 		private string text;
 		private string lineText;
 		private int line;
-        private GroupCollection groups;
+        //private GroupCollection groups;
 		
 		public FindMatch(ScintillaControl sci, Match m)
 		{
@@ -42,6 +43,15 @@ namespace FindReplaceEx
 			position = pos;
 			text = ftext;
 			lineText = ftext;
+            if (scintilla != null)
+            {
+                column = scintilla.Column(position);
+            }
+            else
+            {
+                column = 0;
+            }
+
 		}
 		
 		private void NewMatch(Match m)
@@ -49,6 +59,7 @@ namespace FindReplaceEx
 			match = m;
 			position = m.Index;			
 			line = scintilla.LineFromPosition(position);
+            column = scintilla.Column(position);
 			text = m.Value;
 			lineText = scintilla.GetLine(line);
 		}
@@ -58,12 +69,19 @@ namespace FindReplaceEx
 				return line;
 			}
 		}
-		public int Position {
+		public Int32 Position {
 			get {
 				return position;
 			}
 		}
-		/// <summary>
+        public int Column
+        {
+            get
+            {
+                return column;
+            }
+        }
+        /// <summary>
 		/// the "find" text iteself
 		/// </summary>
 		public string Text {

@@ -42,7 +42,7 @@ namespace FindReplaceEx
 			//lastResults = new FindResults();
 			foreach(string file in files)
 			{
-				line = 1;
+				line = 0;
 				position = 0;
 				enc = GetEncoding(file);
 				using( sr = new StreamReader(file, enc) )
@@ -143,7 +143,7 @@ namespace FindReplaceEx
 
 
 		/// <summary>
-		/// THIS FUNCTION IS NOT COMPLETE!!
+		/// THIS FUNCTION IS COMPLETE!!
 		/// </summary>
 		/// <param name="args"></param>
 		/// <returns></returns>
