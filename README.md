@@ -19,6 +19,6 @@ After selecting "replace" tab, the list will become with checkboxes. All the bol
 
 The replace also works after searching all the files in a folder, only then (for safty reasons) the operation opens all the files in the results list and make the search again, then you can replace saftly.
 
-<h4>Grouping and Filters</h4>
+<h4>Grouping and Filters:</h4>
 Added in the 3rd release of the plugin, an option to group all the results according to the files. If you search multiple files it is a huge advantage to know what you are looking at.
 In the screenshot you can see the Filter tab opened and a word written in it. This will highlight and check all the results that contains that word, so you can replace or delete only filtered results. After a filter had been applied, you can manually add or remove check marks of results.
