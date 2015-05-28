@@ -25,6 +25,7 @@ using ASCompletion.Context;
 using ASCompletion.Model;
 using System.Collections.Generic;
 using FindReplaceEx.Resources;
+using PluginCore.Managers;
 
 namespace FindReplaceEx
 {
@@ -37,7 +38,7 @@ namespace FindReplaceEx
 		private string pluginAuth = "Itzik Arzoni";
 		private string pluginHelp = "http://www.flashdevelop.org/community/viewtopic.php?t=485";
 		private string pluginDesc = "Find and Replace plugin Expanded";
-        private EventType eventMask = EventType.UIRefresh | EventType.ApplySettings | EventType.Keys | EventType.FileSwitch;
+        private EventType eventMask = EventType.UIRefresh | EventType.ApplySettings | EventType.Keys | EventType.FileSwitch | EventType.SettingChanged;
 		private DockContent pluginPanel;
 		private PluginUI pluginUI;
         private String settingFilename;
@@ -207,6 +208,13 @@ namespace FindReplaceEx
                 case EventType.FileSwitch:
                     pluginUI.setFilterMaskTxt(PluginBase.MainForm.CurrentDocument.FileName.Split('.')[1]);
                     break;
+                case EventType.SettingChanged:
+                    if (this.settingObject.SearchHistoryLimit == 0)
+                    {
+                        MessageBox.Show("you can't put 0 in 'Search History Limit'");
+                        this.settingObject.SearchHistoryLimit = 10;
+                    }
+                    break;
             }
         }
 
@@ -219,7 +227,7 @@ namespace FindReplaceEx
 
         #endregion
 
-        #region Custom Methods
+       #region Custom Methods
 
         /// <summary>
         /// Initializes important variables

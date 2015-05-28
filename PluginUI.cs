@@ -20,7 +20,6 @@ using System.Collections.Generic;
 using PluginCore;
 using PluginCore.Managers;
 using System.Drawing;
-using PluginCore.Managers;//remove
 using FlashDevelop;
 using WeifenLuo.WinFormsUI.Docking;
 
@@ -66,7 +65,6 @@ namespace FindReplaceEx
         private RadioButton checkFileRdo;
         private RadioButton checkSelectonRdo;
         private RadioButton checkFilterRdo;
-        private GroupBox filterGroup;
         private RadioButton checkAllRdo;
         private ColumnHeader at;
         private ListView resultsLst;
@@ -74,7 +72,6 @@ namespace FindReplaceEx
         private CheckBox regexpChk;
         private CheckBox wholeWordChk;
         private CheckBox matchCaseChk;
-        private GroupBox findGroup;
         private ColumnHeader result;
         private ColumnHeader filename;
         private ColumnHeader mark;
@@ -89,6 +86,12 @@ namespace FindReplaceEx
         private Splitter splitter;
         private Panel optionsPanel;
         private bool inReplace;
+        private FlowLayoutPanel filterRadioFlow;
+        private FlowLayoutPanel findChkFlow;
+        private FlowLayoutPanel replacePageFlow;
+        private FlowLayoutPanel filterPageFlow;
+        private FlowLayoutPanel foldersPageFlow;
+        private FlowLayoutPanel operationsPageFlow;
 //		private bool classPathRoot;
 		
 		public PluginUI(PluginMain pluginMain)
@@ -151,332 +154,279 @@ namespace FindReplaceEx
             this.operationsPage = new System.Windows.Forms.TabPage();
             this.CopyResultsBtn = new System.Windows.Forms.Button();
             this.resultsLbl = new System.Windows.Forms.Label();
-            this.filterGroup = new System.Windows.Forms.GroupBox();
             this.at = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.resultsLst = new System.Windows.Forms.ListView();
             this.mark = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.result = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.filename = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.fileBrowserDlg = new System.Windows.Forms.FolderBrowserDialog();
-            this.findGroup = new System.Windows.Forms.GroupBox();
             this.splitter = new Splitter();
             this.optionsPanel = new Panel();
+            this.filterRadioFlow = new FlowLayoutPanel();
+            this.findChkFlow = new FlowLayoutPanel();
+            this.replacePageFlow = new FlowLayoutPanel();
+            this.filterPageFlow = new FlowLayoutPanel();
+            this.foldersPageFlow = new FlowLayoutPanel();
+            this.operationsPageFlow = new FlowLayoutPanel();
             this.tabControl.SuspendLayout();
             this.optionsPage.SuspendLayout();
             this.replacePage.SuspendLayout();
             this.filterPage.SuspendLayout();
             this.foldersPage.SuspendLayout();
             this.operationsPage.SuspendLayout();
-            this.filterGroup.SuspendLayout();
-            this.findGroup.SuspendLayout();
+            this.filterRadioFlow.SuspendLayout();
+            this.findChkFlow.SuspendLayout();
+            this.replacePageFlow.SuspendLayout();
+            this.filterPageFlow.SuspendLayout();
+            this.foldersPageFlow.SuspendLayout();
+            this.operationsPageFlow.SuspendLayout();
             this.SuspendLayout();
             this.hideLeftSide();
             // 
             // findTxt
             // 
-            this.findTxt.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.findTxt.IntegralHeight = false;
-            //this.findTxt.Location = new System.Drawing.Point(374, 4);
             this.findTxt.Name = "findTxt";
-            //this.findTxt.Size = new System.Drawing.Size(216, 21);
             this.findTxt.Dock = DockStyle.Top;
-            this.findTxt.TabIndex = 0;
             this.findTxt.SelectedValueChanged += new System.EventHandler(this.selectedItemFindTxt);
             this.findTxt.TextChanged += new System.EventHandler(this.FindTxtTextChanged);
             this.findTxt.KeyDown += new System.Windows.Forms.KeyEventHandler(this.keyDownHandler);
             // 
-            // checkNoneRdo
+            // resultsLbl
             // 
-            this.checkNoneRdo.AutoSize = true;
-            this.checkNoneRdo.BackColor = System.Drawing.Color.Transparent;
-            this.checkNoneRdo.Location = new System.Drawing.Point(314, 16);
-            this.checkNoneRdo.Margin = new System.Windows.Forms.Padding(0);
+            this.resultsLbl.Name = "resultsLbl";
+            this.resultsLbl.Text = "----";
+            this.resultsLbl.AutoSize = true;
+            // 
+            // checkNoneRdo
+            //            
             this.checkNoneRdo.Name = "checkNoneRdo";
-            this.checkNoneRdo.Size = new System.Drawing.Size(51, 17);
-            this.checkNoneRdo.TabIndex = 3;
             this.checkNoneRdo.Text = "None";
+            this.checkNoneRdo.AutoSize = true;
             this.toolTip.SetToolTip(this.checkNoneRdo, "Uncheck all the entries to not replace");
-            this.checkNoneRdo.UseVisualStyleBackColor = false;
             this.checkNoneRdo.CheckedChanged += new System.EventHandler(this.CheckRdoCheckedChanged);
             // 
             // checkcCustomeRdo
             // 
-            this.checkcCustomeRdo.AutoSize = true;
-            this.checkcCustomeRdo.BackColor = System.Drawing.Color.Transparent;
-            this.checkcCustomeRdo.Location = new System.Drawing.Point(182, 16);
-            this.checkcCustomeRdo.Margin = new System.Windows.Forms.Padding(0);
             this.checkcCustomeRdo.Name = "checkcCustomeRdo";
-            this.checkcCustomeRdo.Size = new System.Drawing.Size(66, 17);
-            this.checkcCustomeRdo.TabIndex = 6;
             this.checkcCustomeRdo.Text = "Custome";
+            this.checkcCustomeRdo.AutoSize = true;
             this.toolTip.SetToolTip(this.checkcCustomeRdo, "Default for manually checked entries.");
-            this.checkcCustomeRdo.UseVisualStyleBackColor = false;
             this.checkcCustomeRdo.CheckedChanged += new System.EventHandler(this.CheckRdoCheckedChanged);
             // 
             // checkFileRdo
             // 
-            this.checkFileRdo.AutoSize = true;
-            this.checkFileRdo.BackColor = System.Drawing.Color.Transparent;
             this.checkFileRdo.Checked = true;
-            this.checkFileRdo.Location = new System.Drawing.Point(2, 16);
-            this.checkFileRdo.Margin = new System.Windows.Forms.Padding(0);
             this.checkFileRdo.Name = "checkFileRdo";
-            this.checkFileRdo.Size = new System.Drawing.Size(41, 17);
-            this.checkFileRdo.TabIndex = 4;
-            this.checkFileRdo.TabStop = false;
             this.checkFileRdo.Text = "File";
-            this.toolTip.SetToolTip(this.checkFileRdo, "Check all the entries of the current file. (Same as All if \"search all opened fil" +
-        "es\" is unchecked)");
-            this.checkFileRdo.UseVisualStyleBackColor = false;
+            this.checkFileRdo.AutoSize = true;
+            this.toolTip.SetToolTip(this.checkFileRdo, "Check all the entries of the current file. (Same as All if \"search all opened fil" + "es\" is unchecked)");
             this.checkFileRdo.CheckedChanged += new System.EventHandler(this.CheckRdoCheckedChanged);
             // 
             // checkSelectonRdo
             // 
-            this.checkSelectonRdo.AutoSize = true;
-            this.checkSelectonRdo.BackColor = System.Drawing.Color.Transparent;
-            this.checkSelectonRdo.Location = new System.Drawing.Point(46, 16);
-            this.checkSelectonRdo.Margin = new System.Windows.Forms.Padding(0);
             this.checkSelectonRdo.Name = "checkSelectonRdo";
-            this.checkSelectonRdo.Size = new System.Drawing.Size(69, 17);
-            this.checkSelectonRdo.TabIndex = 5;
             this.checkSelectonRdo.Text = "Selection";
+            this.checkSelectonRdo.AutoSize = true;
             this.toolTip.SetToolTip(this.checkSelectonRdo, "Check all the checkboxes that inside the selection.");
-            this.checkSelectonRdo.UseVisualStyleBackColor = false;
             this.checkSelectonRdo.CheckedChanged += new System.EventHandler(this.CheckRdoCheckedChanged);
             // 
             // checkFilterRdo
             // 
-            this.checkFilterRdo.AutoSize = true;
-            this.checkFilterRdo.BackColor = System.Drawing.Color.Transparent;
-            this.checkFilterRdo.Location = new System.Drawing.Point(121, 16);
-            this.checkFilterRdo.Margin = new System.Windows.Forms.Padding(0);
             this.checkFilterRdo.Name = "checkFilterRdo";
-            this.checkFilterRdo.Size = new System.Drawing.Size(47, 17);
-            this.checkFilterRdo.TabIndex = 6;
             this.checkFilterRdo.Text = "Filter";
+            this.checkFilterRdo.AutoSize = true;
             this.toolTip.SetToolTip(this.checkFilterRdo, "Check the entries that match the filter string");
-            this.checkFilterRdo.UseVisualStyleBackColor = false;
             this.checkFilterRdo.CheckedChanged += new System.EventHandler(this.CheckRdoCheckedChanged);
+            // 
+            // checkAllRdo
+            // 
+            this.checkAllRdo.Name = "checkAllRdo";
+            this.checkAllRdo.Text = "All";
+            this.checkAllRdo.AutoSize = true;
+            this.toolTip.SetToolTip(this.checkAllRdo, "Check all the entries to replace");
+            this.checkAllRdo.CheckedChanged += new System.EventHandler(this.CheckRdoCheckedChanged);
+            // 
+            // flowLayPan
+            //
+            this.filterRadioFlow.AutoSize = true;
+            this.filterRadioFlow.Controls.Add(this.resultsLbl);
+            this.filterRadioFlow.SetFlowBreak(this.resultsLbl, true);
+            this.filterRadioFlow.Controls.Add(checkNoneRdo);
+            this.filterRadioFlow.Controls.Add(checkcCustomeRdo);
+            this.filterRadioFlow.Controls.Add(checkFileRdo);
+            this.filterRadioFlow.Controls.Add(checkSelectonRdo);
+            this.filterRadioFlow.Controls.Add(checkFilterRdo);
+            this.filterRadioFlow.Controls.Add(checkAllRdo);
+            this.filterRadioFlow.FlowDirection = FlowDirection.LeftToRight;
+            this.filterRadioFlow.Dock = DockStyle.Bottom;
+            this.ResumeLayout();
             // 
             // folderFilesChk
             // 
-            this.folderFilesChk.Location = new System.Drawing.Point(8, 32);
             this.folderFilesChk.Name = "folderFilesChk";
-            this.folderFilesChk.Size = new System.Drawing.Size(108, 24);
-            this.folderFilesChk.TabIndex = 9;
             this.folderFilesChk.Text = "All Files in Folder";
             this.folderFilesChk.ThreeState = true;
+            this.folderFilesChk.AutoSize = true;
             this.toolTip.SetToolTip(this.folderFilesChk, "Check this to set the next search to be in alll files in the above directory.");
             this.folderFilesChk.CheckStateChanged += new System.EventHandler(this.FolderFilesChkCheckedStateChanged);
             // 
             // browseBtn
             // 
-            this.browseBtn.Location = new System.Drawing.Point(232, 32);
             this.browseBtn.Name = "browseBtn";
-            this.browseBtn.Size = new System.Drawing.Size(66, 23);
-            this.browseBtn.TabIndex = 1;
             this.browseBtn.Text = "Browse...";
+            this.browseBtn.AutoSize = true;
             this.toolTip.SetToolTip(this.browseBtn, "Browse for a folder to search in.");
             this.browseBtn.Click += new System.EventHandler(this.BrowseBtnClick);
             // 
             // searchSubfoldersChk
             // 
-            this.searchSubfoldersChk.Checked = true;
             this.searchSubfoldersChk.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.searchSubfoldersChk.Location = new System.Drawing.Point(104, 32);
             this.searchSubfoldersChk.Name = "searchSubfoldersChk";
-            this.searchSubfoldersChk.Size = new System.Drawing.Size(80, 24);
-            this.searchSubfoldersChk.TabIndex = 9;
             this.searchSubfoldersChk.Text = "Subfolders";
+            this.searchSubfoldersChk.AutoSize = true;
             this.toolTip.SetToolTip(this.searchSubfoldersChk, "Also search in subfolders.");
             this.searchSubfoldersChk.CheckedChanged += new System.EventHandler(this.FolderFilesChkCheckedStateChanged);
             // 
             // fileMaskTxt
             // 
-            this.fileMaskTxt.Location = new System.Drawing.Point(177, 33);
             this.fileMaskTxt.Name = "fileMaskTxt";
-            this.fileMaskTxt.Size = new System.Drawing.Size(48, 20);
-            this.fileMaskTxt.TabIndex = 10;
             this.toolTip.SetToolTip(this.fileMaskTxt, "Specify the file mask to search in.");
             // 
             // openFilesChk
             // 
-            this.openFilesChk.Checked = true;
             this.openFilesChk.CheckState = System.Windows.Forms.CheckState.Checked;
             this.openFilesChk.Name = "openFilesChk";
-            this.openFilesChk.TabIndex = 9;
             this.openFilesChk.Dock = DockStyle.Top;
             this.openFilesChk.Text = "All Opened Files";
+            this.openFilesChk.AutoSize = true;
             this.toolTip.SetToolTip(this.openFilesChk, "Show the reslts from all opened files.");
             this.openFilesChk.CheckedChanged += new System.EventHandler(this.OptionsChkCheckedChanged);
             // 
             // autoChk
             // 
             this.autoChk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.autoChk.Checked = true;
             this.autoChk.CheckState = System.Windows.Forms.CheckState.Checked;
             this.autoChk.Name = "autoChk";
             this.autoChk.Dock = DockStyle.Top;
-            this.autoChk.TabIndex = 4;
-            this.autoChk.Tag = "";
             this.autoChk.Text = "Automatic find";
+            this.autoChk.AutoSize = true;
             this.toolTip.SetToolTip(this.autoChk, "List results immediately  while typing in the find box.");
             // 
             // autoFeedChk
             // 
-            this.autoFeedChk.Checked = true;
             this.autoFeedChk.CheckState = System.Windows.Forms.CheckState.Checked;
             this.autoFeedChk.Name = "autoFeedChk";
             this.autoFeedChk.Dock = DockStyle.Top;
-            this.autoFeedChk.TabIndex = 21;
-            this.autoFeedChk.Tag = "";
             this.autoFeedChk.Text = "Update as you type";
+            this.autoFeedChk.AutoSize = true;
             this.toolTip.SetToolTip(this.autoFeedChk, "Update the find box when typing in the editor");
-            // 
-            // checkAllRdo
-            // 
-            this.checkAllRdo.AutoSize = true;
-            this.checkAllRdo.BackColor = System.Drawing.Color.Transparent;
-            this.checkAllRdo.Location = new System.Drawing.Point(264, 16);
-            this.checkAllRdo.Margin = new System.Windows.Forms.Padding(0);
-            this.checkAllRdo.Name = "checkAllRdo";
-            this.checkAllRdo.Size = new System.Drawing.Size(36, 17);
-            this.checkAllRdo.TabIndex = 2;
-            this.checkAllRdo.Text = "All";
-            this.toolTip.SetToolTip(this.checkAllRdo, "Check all the entries to replace");
-            this.checkAllRdo.UseVisualStyleBackColor = false;
-            this.checkAllRdo.CheckedChanged += new System.EventHandler(this.CheckRdoCheckedChanged);
             // 
             // regexHelpBtn
             // 
-            this.regexHelpBtn.Location = new System.Drawing.Point(282, 8);
             this.regexHelpBtn.Name = "regexHelpBtn";
-            this.regexHelpBtn.Size = new System.Drawing.Size(19, 21);
-            this.regexHelpBtn.TabIndex = 7;
             this.regexHelpBtn.Text = "?";
+            this.regexHelpBtn.AutoSize = true;
             this.toolTip.SetToolTip(this.regexHelpBtn, "Help about regular expressions");
             this.regexHelpBtn.Click += new System.EventHandler(this.RegexHelpBtnClick);
             // 
             // regexpChk
             // 
-            this.regexpChk.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.regexpChk.Location = new System.Drawing.Point(189, 12);
             this.regexpChk.Name = "regexpChk";
-            this.regexpChk.Size = new System.Drawing.Size(54, 24);
-            this.regexpChk.TabIndex = 4;
-            this.regexpChk.Tag = "";
             this.regexpChk.Text = "RegEx";
+            this.regexpChk.AutoSize = true;
             this.toolTip.SetToolTip(this.regexpChk, "Threat the find text as Regular Expression");
             this.regexpChk.CheckedChanged += new System.EventHandler(this.regexpChk_CheckedChanged);
             // 
             // wholeWordChk
             // 
-            this.wholeWordChk.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.wholeWordChk.Location = new System.Drawing.Point(99, 12);
             this.wholeWordChk.Name = "wholeWordChk";
-            this.wholeWordChk.Size = new System.Drawing.Size(84, 24);
-            this.wholeWordChk.TabIndex = 3;
-            this.wholeWordChk.Tag = "";
             this.wholeWordChk.Text = "Whole Word";
+            this.wholeWordChk.AutoSize = true;
             this.toolTip.SetToolTip(this.wholeWordChk, "Search for whole word only");
             // 
             // matchCaseChk
             // 
-            this.matchCaseChk.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.matchCaseChk.Location = new System.Drawing.Point(11, 12);
             this.matchCaseChk.Name = "matchCaseChk";
-            this.matchCaseChk.Size = new System.Drawing.Size(88, 24);
-            this.matchCaseChk.TabIndex = 2;
-            this.matchCaseChk.Tag = "";
             this.matchCaseChk.Text = "Match Case";
+            this.matchCaseChk.AutoSize = true;
             this.toolTip.SetToolTip(this.matchCaseChk, "Ignore the case OF cHaraCtERs");
             // 
             // ofrBtn
             // 
-            this.ofrBtn.BackColor = System.Drawing.Color.Silver;
-            this.ofrBtn.Location = new System.Drawing.Point(240, 8);
             this.ofrBtn.Name = "ofrBtn";
-            this.ofrBtn.Size = new System.Drawing.Size(64, 32);
-            this.ofrBtn.TabIndex = 7;
             this.ofrBtn.Text = "Open Files && Search ";
+            this.ofrBtn.AutoSize = true;
             this.toolTip.SetToolTip(this.ofrBtn, "Open all the files in the results list and redo he search");
-            this.ofrBtn.UseVisualStyleBackColor = false;
             this.ofrBtn.Click += new System.EventHandler(this.OfrBtnClick);
             // 
             // button1
             // 
-            this.clearReplaceTxt.Location = new System.Drawing.Point(this.copyFindReplaceBtn.Location.X + this.copyFindReplaceBtn.Size.Width+30, 32);
             this.clearReplaceTxt.Name = "button1";
-            this.clearReplaceTxt.Size = new System.Drawing.Size(45, 27);
-            this.clearReplaceTxt.TabIndex = 7;
             this.clearReplaceTxt.Text = "Clear";
+            this.clearReplaceTxt.AutoSize = true;
             this.toolTip.SetToolTip(this.clearReplaceTxt, "Clear the text from the find box");
             this.clearReplaceTxt.Click += new System.EventHandler(this.clearReplaceTxtClick);
             // 
             // copyFindReplaceBtn
             // 
-            this.copyFindReplaceBtn.Location = new System.Drawing.Point(this.switchFindReplaceBtn.Location.X + this.switchFindReplaceBtn.Size.Width-15, 32);
             this.copyFindReplaceBtn.Name = "copyFindReplaceBtn";
-            this.copyFindReplaceBtn.Size = new System.Drawing.Size(45, 27);
-            this.copyFindReplaceBtn.TabIndex = 7;
             this.copyFindReplaceBtn.Text = "Copy";
+            this.copyFindReplaceBtn.AutoSize = true;
             this.toolTip.SetToolTip(this.copyFindReplaceBtn, "Copies the text from the find box");
             this.copyFindReplaceBtn.Click += new System.EventHandler(this.copyFindReplaceBtnClick);
             // 
             // replaceBtn
             // 
-            this.replaceBtn.Location = new System.Drawing.Point(242, 8);
             this.replaceBtn.Name = "replaceBtn";
-            this.replaceBtn.Size = new System.Drawing.Size(59, 23);
-            this.replaceBtn.TabIndex = 1;
             this.replaceBtn.Text = "Replace";
+            this.replaceBtn.AutoSize = true;
             this.toolTip.SetToolTip(this.replaceBtn, "Replace the selected text in all the checked entries");
             this.replaceBtn.Click += new System.EventHandler(this.ReplaceBtnClick);
             // 
             // switchFindReplaceBtn
             // 
-            this.switchFindReplaceBtn.Location = new System.Drawing.Point(8, 32);
             this.switchFindReplaceBtn.Name = "switchFindReplaceBtn";
-            this.switchFindReplaceBtn.Size = new System.Drawing.Size(52, 27);
-            this.switchFindReplaceBtn.TabIndex = 7;
             this.switchFindReplaceBtn.Text = "Switch";
+            this.switchFindReplaceBtn.AutoSize = true;
             this.toolTip.SetToolTip(this.switchFindReplaceBtn, "Switches the text between find and replace");
             this.switchFindReplaceBtn.Click += new System.EventHandler(this.SwtchFindReplaceBtnClick);
             // 
             // bookmarkBtn
             // 
-            this.bookmarkBtn.Location = new System.Drawing.Point(8, 7);
             this.bookmarkBtn.Name = "bookmarkBtn";
-            this.bookmarkBtn.Size = new System.Drawing.Size(75, 23);
-            this.bookmarkBtn.TabIndex = 0;
             this.bookmarkBtn.Text = "Bookmark";
+            this.bookmarkBtn.AutoSize = true;
             this.toolTip.SetToolTip(this.bookmarkBtn, "Bookmark all the selected items");
-            this.bookmarkBtn.UseVisualStyleBackColor = true;
             this.bookmarkBtn.Click += new System.EventHandler(this.bookmarkBtn_Click);
             // 
             // deleteBtn
             // 
-            this.deleteBtn.Location = new System.Drawing.Point(89, 7);
             this.deleteBtn.Name = "deleteBtn";
-            this.deleteBtn.Size = new System.Drawing.Size(75, 23);
-            this.deleteBtn.TabIndex = 1;
             this.deleteBtn.Text = "Delete";
+            this.deleteBtn.AutoSize = true;
             this.toolTip.SetToolTip(this.deleteBtn, "Delete all selected line");
-            this.deleteBtn.UseVisualStyleBackColor = true;
             this.deleteBtn.Click += new System.EventHandler(this.deleteBtn_Click);
             // 
             // regExReplaceChk
             // 
-            this.regExReplaceChk.AutoSize = true;
-            this.regExReplaceChk.Location = new System.Drawing.Point(160, 36);
             this.regExReplaceChk.Name = "regExReplaceChk";
-            this.regExReplaceChk.Size = new System.Drawing.Size(96, 17);
-            this.regExReplaceChk.TabIndex = 8;
             this.regExReplaceChk.Text = "RegEx replace";
+            this.regExReplaceChk.AutoSize = true;
             this.toolTip.SetToolTip(this.regExReplaceChk, "If checked, you can use searched groups from the match in your replace. \\n Write " +
         "$1 to insert the text from the first group, and so on.");
-            this.regExReplaceChk.UseVisualStyleBackColor = true;
+            // 
+            // replacePageFlow
+            // 
+            this.replacePageFlow.Controls.Add(this.replaceTxt);
+            this.replacePageFlow.Controls.Add(this.replaceBtn);
+            this.replacePageFlow.SetFlowBreak(this.replaceBtn, true);
+            this.replacePageFlow.Controls.Add(this.switchFindReplaceBtn);
+            this.replacePageFlow.Controls.Add(this.copyFindReplaceBtn);
+            this.replacePageFlow.Controls.Add(this.clearReplaceTxt);
+            this.replacePageFlow.Controls.Add(this.ofrBtn);
+            this.replacePageFlow.Controls.Add(this.regExReplaceChk);
+            this.replacePageFlow.Dock = DockStyle.Top;
+            this.replacePageFlow.AutoSize = true;
             // 
             // tabControl
             // 
@@ -488,7 +438,6 @@ namespace FindReplaceEx
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
             this.tabControl.Dock = DockStyle.Fill;
-            this.tabControl.TabIndex = 5;
             this.tabControl.SelectedIndexChanged += new System.EventHandler(this.TabControlSelectedIndexChanged);
             // 
             // optionsPage
@@ -496,49 +445,36 @@ namespace FindReplaceEx
             this.optionsPage.Controls.Add(this.autoFeedChk);
             this.optionsPage.Controls.Add(this.autoChk);
             this.optionsPage.Controls.Add(this.openFilesChk);
-            this.optionsPage.Location = new System.Drawing.Point(4, 22);
             this.optionsPage.Name = "optionsPage";
-            this.optionsPage.Size = new System.Drawing.Size(304, 64);
-            this.optionsPage.TabIndex = 2;
             this.optionsPage.Text = "Options";
-            this.optionsPage.UseVisualStyleBackColor = true;
             // 
             // replacePage
             // 
-            this.replacePage.Controls.Add(this.regExReplaceChk);
-            this.replacePage.Controls.Add(this.switchFindReplaceBtn);
-            this.replacePage.Controls.Add(this.replaceTxt);
-            this.replacePage.Controls.Add(this.replaceBtn);
-            this.replacePage.Controls.Add(this.copyFindReplaceBtn);
-            this.replacePage.Controls.Add(this.clearReplaceTxt);
-            this.replacePage.Controls.Add(this.ofrBtn);
-            this.replacePage.Location = new System.Drawing.Point(4, 22);
+            this.replacePage.Controls.Add(this.replacePageFlow);
             this.replacePage.Name = "replacePage";
-            this.replacePage.Size = new System.Drawing.Size(304, 64);
-            this.replacePage.TabIndex = 0;
             this.replacePage.Text = "Replace";
-            this.replacePage.UseVisualStyleBackColor = true;
             // 
             // replaceTxt
             // 
-            this.replaceTxt.Location = new System.Drawing.Point(4, 8);
             this.replaceTxt.Name = "replaceTxt";
-            this.replaceTxt.Size = new System.Drawing.Size(238, 20);
-            this.replaceTxt.TabIndex = 0;
             this.replaceTxt.Text = "@FIND";
-            this.replaceTxt.KeyDown += new System.Windows.Forms.KeyEventHandler(this.keyDownHandler);
+            this.replaceTxt.AutoSize = true;
+            this.replaceTxt.KeyDown += new System.Windows.Forms.KeyEventHandler(this.keyDownHandler);           
+            // 
+            // filterPageFlow
+            // 
+            this.filterPageFlow.Controls.Add(this.filterTxt);
+            this.filterPageFlow.SetFlowBreak(this.filterTxt, true);
+            this.filterPageFlow.Controls.Add(this.regexHelpBtn);
+            this.filterPageFlow.Controls.Add(this.clearFilterBtn);
+            this.filterPageFlow.Dock = DockStyle.Top;
             // 
             // filterPage
             // 
-            this.filterPage.Controls.Add(this.filterTxt);
-            this.filterPage.Controls.Add(this.clearFilterBtn);
-            this.filterPage.Controls.Add(this.regexHelpBtn);
-            this.filterPage.Location = new System.Drawing.Point(4, 22);
+
+            this.filterPage.Controls.Add(this.filterPageFlow);
             this.filterPage.Name = "filterPage";
-            this.filterPage.Size = new System.Drawing.Size(304, 64);
-            this.filterPage.TabIndex = 2;
             this.filterPage.Text = "Filter";
-            this.filterPage.UseVisualStyleBackColor = true;
             // 
             // filterTxt
             // 
@@ -546,123 +482,85 @@ namespace FindReplaceEx
             "",
             "(import|new)\\s*[\\w\\.]*@FIND[\\.;]",
             "(function|var)\\s*\\w*\\s*:\\s*@FIND\\s*[;\\(]"});
-            this.filterTxt.Location = new System.Drawing.Point(8, 8);
             this.filterTxt.Name = "filterTxt";
-            this.filterTxt.Size = new System.Drawing.Size(243, 21);
-            this.filterTxt.TabIndex = 15;
             this.filterTxt.TextChanged += new System.EventHandler(this.FilterTxtTextChanged);
             // 
             // clearFilterBtn
             // 
-            this.clearFilterBtn.Location = new System.Drawing.Point(257, 8);
             this.clearFilterBtn.Name = "clearFilterBtn";
-            this.clearFilterBtn.Size = new System.Drawing.Size(19, 21);
-            this.clearFilterBtn.TabIndex = 7;
             this.clearFilterBtn.Text = "X";
+            this.clearFilterBtn.AutoSize = true;
             this.clearFilterBtn.Click += new System.EventHandler(this.clearFilterBtn_Click);
+            // 
+            // foldersPageFlow
+            // 
+            this.foldersPageFlow.Controls.Add(this.folderTxt);
+            this.foldersPageFlow.Controls.Add(this.browseBtn);
+            this.foldersPageFlow.SetFlowBreak(this.browseBtn, true);
+            this.foldersPageFlow.Controls.Add(this.folderFilesChk);
+            this.foldersPageFlow.Controls.Add(this.searchSubfoldersChk);  
+            this.foldersPageFlow.Controls.Add(this.fileMaskTxt);              
+            this.foldersPageFlow.Name = "foldersPageFlow";
+            this.foldersPageFlow.Dock = DockStyle.Top;
             // 
             // foldersPage
             // 
-            this.foldersPage.Controls.Add(this.fileMaskTxt);
-            this.foldersPage.Controls.Add(this.searchSubfoldersChk);
-            this.foldersPage.Controls.Add(this.browseBtn);
-            this.foldersPage.Controls.Add(this.folderTxt);
-            this.foldersPage.Controls.Add(this.folderFilesChk);
-            this.foldersPage.Location = new System.Drawing.Point(4, 22);
+            this.foldersPage.Controls.Add(this.foldersPageFlow);
             this.foldersPage.Name = "foldersPage";
-            this.foldersPage.Size = new System.Drawing.Size(304, 64);
-            this.foldersPage.TabIndex = 1;
             this.foldersPage.Text = "Folders";
-            this.foldersPage.UseVisualStyleBackColor = true;
             // 
             // folderTxt
             // 
             this.folderTxt.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.folderTxt.Location = new System.Drawing.Point(4, 8);
             this.folderTxt.Name = "folderTxt";
-            this.folderTxt.Size = new System.Drawing.Size(296, 21);
-            this.folderTxt.TabIndex = 2;
             this.folderTxt.DrawMode = DrawMode.OwnerDrawFixed;
             this.folderTxt.DrawItem += folderTxt_DrawItem;
             this.folderTxt.DropDownClosed += folderTxt_DropDownClosed;
             this.folderTxt.SelectedIndexChanged += new System.EventHandler(this.FolderTxtSelectedIndexChanged);
             // 
+            // operationsPageFlow
+            // 
+            this.operationsPageFlow.Controls.Add(this.CopyResultsBtn);
+            this.operationsPageFlow.Controls.Add(this.deleteBtn);
+            this.operationsPageFlow.Controls.Add(this.bookmarkBtn);
+            this.operationsPageFlow.Dock = DockStyle.Top;
+            this.operationsPageFlow.Name = "operationsPageFlow";
+            // 
             // operationsPage
             // 
-            this.operationsPage.Controls.Add(this.CopyResultsBtn);
-            this.operationsPage.Controls.Add(this.deleteBtn);
-            this.operationsPage.Controls.Add(this.bookmarkBtn);
-            this.operationsPage.Location = new System.Drawing.Point(4, 22);
+            this.operationsPage.Controls.Add(this.operationsPageFlow);
             this.operationsPage.Name = "operationsPage";
-            this.operationsPage.Padding = new System.Windows.Forms.Padding(3);
-            this.operationsPage.Size = new System.Drawing.Size(304, 64);
-            this.operationsPage.TabIndex = 3;
             this.operationsPage.Text = "Operations";
-            this.operationsPage.UseVisualStyleBackColor = true;
             // 
             // CopyResultsBtn
             // 
-            this.CopyResultsBtn.Location = new System.Drawing.Point(8, 35);
             this.CopyResultsBtn.Name = "CopyResultsBtn";
-            this.CopyResultsBtn.Size = new System.Drawing.Size(107, 23);
-            this.CopyResultsBtn.TabIndex = 1;
             this.CopyResultsBtn.Text = "Copy To Results";
-            this.CopyResultsBtn.UseVisualStyleBackColor = true;
+            this.CopyResultsBtn.AutoSize = true;
             this.CopyResultsBtn.Click += new System.EventHandler(this.CopyResultsBtn_Click);
-            // 
-            // resultsLbl
-            // 
-            this.resultsLbl.AutoSize = true;
-            this.resultsLbl.Location = new System.Drawing.Point(38, 0);
-            this.resultsLbl.Name = "resultsLbl";
-            this.resultsLbl.Size = new System.Drawing.Size(19, 13);
-            this.resultsLbl.TabIndex = 8;
-            this.resultsLbl.Text = "----";
-            // 
-            // filterGroup
-            // 
-            this.filterGroup.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.filterGroup.Controls.Add(this.resultsLbl);
-            this.filterGroup.Controls.Add(this.checkFilterRdo);
-            this.filterGroup.Controls.Add(this.checkSelectonRdo);
-            this.filterGroup.Controls.Add(this.checkFileRdo);
-            this.filterGroup.Controls.Add(this.checkcCustomeRdo);
-            this.filterGroup.Controls.Add(this.checkAllRdo);
-            this.filterGroup.Controls.Add(this.checkNoneRdo);
-            this.filterGroup.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.filterGroup.Dock = DockStyle.Bottom;
-            this.filterGroup.Name = "filterGroup";
-            this.filterGroup.Height = 43;
-            this.filterGroup.TabIndex = 11;
-            this.filterGroup.TabStop = false;
-            this.filterGroup.Text = "Filter";
             // 
             // at
             // 
             this.at.Text = "@";
             this.at.Width = -1;
             // 
+            // splitter
+            // 
+            this.splitter.SplitterMoved += splitter_SplitterMoved;
+            // 
             // resultsLst
             // 
-            this.resultsLst.Alignment = System.Windows.Forms.ListViewAlignment.SnapToGrid;
-            this.resultsLst.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.resultsLst.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.mark,
             this.at,
             this.result,
             this.filename});
-            this.resultsLst.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
             this.resultsLst.FullRowSelect = true;
             this.resultsLst.GridLines = true;
-            this.resultsLst.HideSelection = false;
             this.resultsLst.LabelWrap = false;
+            this.resultsLst.AutoSize = true;
             this.resultsLst.Dock = DockStyle.Fill;
             this.resultsLst.Name = "resultsLst";
-            this.resultsLst.ShowGroups = false;
-            this.resultsLst.TabIndex = 7;
-            this.resultsLst.UseCompatibleStateImageBehavior = false;
             this.resultsLst.View = System.Windows.Forms.View.Details;
             this.resultsLst.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ResultsLstItemCheck);
             this.resultsLst.SelectedIndexChanged += new System.EventHandler(this.resultsLst_SelectedIndexChanged);
@@ -687,25 +585,22 @@ namespace FindReplaceEx
             this.filename.Text = "File Name";
             this.filename.Width = -1;
             // 
-            // findGroup
+            // findChkCont
             // 
-            this.findGroup.Controls.Add(this.matchCaseChk);
-            this.findGroup.Controls.Add(this.wholeWordChk);
-            this.findGroup.Controls.Add(this.regexpChk);
-            this.findGroup.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.findGroup.Name = "findGroup";
-            this.findGroup.Height = 41;
-            this.findGroup.Dock = DockStyle.Top;
-            this.findGroup.TabIndex = 4;
-            this.findGroup.TabStop = false;
-            this.findGroup.Text = "Find";
+            this.findChkFlow.Controls.Add(this.matchCaseChk);
+            this.findChkFlow.Controls.Add(this.wholeWordChk);
+            this.findChkFlow.Controls.Add(this.regexpChk);
+            this.findChkFlow.Name = "findChkCont";
+            this.findChkFlow.Dock = DockStyle.Top;
+            this.findChkFlow.Text = "Find";
+            this.findChkFlow.AutoSize = true;
             // 
             // optionsPanel
             // 
             this.optionsPanel.Controls.Add(tabControl);
-            this.optionsPanel.Controls.Add(findGroup);
+            this.optionsPanel.Controls.Add(findChkFlow);
             this.optionsPanel.Controls.Add(findTxt);
-            this.optionsPanel.Controls.Add(filterGroup);
+            this.optionsPanel.Controls.Add(filterRadioFlow);
             this.optionsPanel.Size = new Size(375,200);
             // 
             // PluginUI
@@ -713,7 +608,9 @@ namespace FindReplaceEx
             this.BackColor = System.Drawing.SystemColors.Control;
             this.Controls.AddRange(new Control[] { this.resultsLst, this.splitter,this.optionsPanel });
             this.Name = "PluginUI";
-            this.Size = new System.Drawing.Size(656, 322);
+
+            splitter_SplitterMoved(null, null);
+
             this.tabControl.ResumeLayout(false);
             this.optionsPage.ResumeLayout(false);
             this.replacePage.ResumeLayout(false);
@@ -722,11 +619,21 @@ namespace FindReplaceEx
             this.foldersPage.ResumeLayout(false);
             this.foldersPage.PerformLayout();
             this.operationsPage.ResumeLayout(false);
-            this.filterGroup.ResumeLayout(false);
-            this.filterGroup.PerformLayout();
-            this.findGroup.ResumeLayout(false);
-            this.ResumeLayout(false);
+            this.filterRadioFlow.ResumeLayout();
+            this.findChkFlow.ResumeLayout();
+            this.replacePageFlow.ResumeLayout();
+            this.filterPageFlow.ResumeLayout();
+            this.foldersPageFlow.ResumeLayout();
+            this.operationsPageFlow.ResumeLayout();
+            this.ResumeLayout(false);           
 		}
+
+        private void splitter_SplitterMoved(object sender, SplitterEventArgs e)
+        {
+            this.folderTxt.Width = tabControl.Width - this.browseBtn.Width - 20;
+            this.filterTxt.Width = tabControl.Width - 20;
+            this.replaceTxt.Width = tabControl.Width - replaceBtn.Width - 20;
+        }
 
 		#endregion
 		
@@ -742,6 +649,15 @@ namespace FindReplaceEx
             autoChk.Checked = settingsObject.FindAsYouType;
 			//resizeToFit = resize;
 			ChangeFilterPresets(settingsObject.FilterPresets);
+            if (settingsObject.SearchHistoryLimit == 0)
+            {
+                settingsObject.SearchHistoryLimit = 10;
+                settingsObject.ResizeOptionsTab = true;
+                settingsObject.ResizeReplaceTab = false;
+                settingsObject.ResizeFilterTab = false;
+                settingsObject.ResizeFoldersTab = true;
+                settingsObject.ResizeOperationsTab = true;
+            }
             findTxt.MaxDropDownItems = settingsObject.SearchHistoryLimit;
             resultsLst.ShowGroups = settingsObject.GroupByFile;
 		}
@@ -876,7 +792,6 @@ namespace FindReplaceEx
                     {
                         file = match.FileName;
                         gr = new ListViewGroup(file, HorizontalAlignment.Left);
-
                         gr.Name = file;
                         gr.Header = file;
                         this.resultsLst.Groups.Add(gr);
@@ -1834,7 +1749,6 @@ namespace FindReplaceEx
         {
             this.optionsPanel.Visible = true;
             this.splitter.Visible = true;
-            //this.resultsLst.Size = new System.Drawing.Size(450, 291);
         }
 
         public void setFilterMaskTxt(string ext)
